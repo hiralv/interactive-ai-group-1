@@ -18,11 +18,14 @@ namespace WastedSea
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Map main_map;
+       // public Texture2D boat, sea, oil, debris;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            main_map = new Map(this);
         }
 
         /// <summary>
@@ -46,7 +49,10 @@ namespace WastedSea
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            main_map.Initialize(GraphicsDevice, Content);
 
+
+            //boat = Content.Load<Texture2D>(@"Boat");
             // TODO: use this.Content to load your game content here
         }
 
@@ -83,9 +89,10 @@ namespace WastedSea
         {
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            main_map.Draw(spriteBatch);
 
             base.Draw(gameTime);
+           
         }
     }
 }
