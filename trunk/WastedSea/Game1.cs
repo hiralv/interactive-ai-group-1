@@ -11,6 +11,14 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace WastedSea
 {
+    public class Object
+    {
+        int x;
+        int y;
+
+
+    }
+
     /// <summary>
     /// This is the main type for your game
     /// </summary>
