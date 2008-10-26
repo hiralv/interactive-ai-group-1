@@ -104,7 +104,7 @@ namespace WastedSea
         SpriteBatch spriteBatch;
         Map main_map;
         Boat object_boat;
-        public Texture2D boat, debris;           //Dynamic object textures.
+        public Texture2D boat, debris,oil;           //Dynamic object textures.
        
 
         //Variables to keep track of key releases.
@@ -143,11 +143,13 @@ namespace WastedSea
             main_map.Initialize(GraphicsDevice, Content);
             boat = Content.Load<Texture2D>(@"Boat");
             debris = Content.Load<Texture2D>(@"Debris");
+            oil = Content.Load<Texture2D>(@"Oil");
             object_boat = new Boat(10, 2, boat);
             dynamic_objects.Add(object_boat);
 
-            int MAX_DEBRIS = 10;
             Random ran_number = new Random();
+
+            int MAX_DEBRIS = 10;
             Debris new_debris;
 
             for (int i = 0; i < MAX_DEBRIS; i++)
@@ -156,6 +158,16 @@ namespace WastedSea
                 int ran_y = ran_number.Next(3, 6);
                 new_debris = new Debris(ran_x, ran_y, debris);
                 dynamic_objects.Add(new_debris);
+            }
+
+            int MAX_OIL = 30;
+            Object new_oil;
+            for (int i = 0; i < MAX_OIL; i++)
+            {
+                int ran_x = ran_number.Next(0, 31);
+                int ran_y = ran_number.Next(7, 24);
+                new_oil = new Object(ran_x, ran_y, oil);
+                dynamic_objects.Add(new_oil);
             }
            
             // TODO: use this.Content to load your game content here
