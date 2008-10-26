@@ -43,7 +43,7 @@ namespace WastedSea
         MapSpace[,] map_array;
         int[,] map_type_array;
 
-        public Texture2D boat, sea, oil, debris, sky, sea_floor, sea_top;
+        public Texture2D sea, oil, sky, sea_floor, sea_top;
 
         public Map(Game game) : base(game)
         {
@@ -62,9 +62,7 @@ namespace WastedSea
 
         public void Initialize(GraphicsDevice Device, ContentManager Content)
         {
-            boat = Content.Load<Texture2D>(@"Boat");
             sea = Content.Load<Texture2D>(@"Sea");
-            debris = Content.Load<Texture2D>(@"Debris");
             oil = Content.Load<Texture2D>(@"Oil");
             sky = Content.Load<Texture2D>(@"Sky");
             sea_floor = Content.Load<Texture2D>(@"SeaFloor");
@@ -104,16 +102,6 @@ namespace WastedSea
                         case 1:
                             {
                                 tile = sea;
-                                break;
-                            }
-                        case 2:
-                            {
-                                tile = debris;
-                                break;
-                            }
-                        case 3:
-                            {
-                                tile = boat;
                                 break;
                             }
                         case 4:

@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace WastedSea
 {
+    //The base class for all game objects that go into the object lists.
     public class Object
     {
         public int x;
@@ -23,8 +24,11 @@ namespace WastedSea
             this.x = x;
             this.y = y;
         }
+
+        public virtual void Think(TimeSpan elapsed_game_time) { }
     }
 
+    //The moveable player-controlled boat.
     public class Boat : Object
     {
         public Boat(int x, int y, Texture2D texture) : base(x,y,texture)
@@ -43,11 +47,49 @@ namespace WastedSea
             }
         }
 
-        public void MoveLeft(){
+        public void MoveLeft()
+        {
             x--;
             if (x < 0)
             {
                 x = 0;
+            }
+        }
+    }
+
+    //Floating debris that require our agent to use D* on the way home.
+    public class Debris : Object
+    {
+        double debri_speed;                  
+        double time;
+        Random ran;
+
+        public Debris(int x, int y, Texture2D texture)
+            : base(x, y, texture)
+        {
+            this.texture = texture;
+            this.x = x;
+            this.y = y;
+            time = 0;
+
+            ran = new Random(x*y);
+            debri_speed = ran.Next(300,1000);
+        }
+
+        //Causes the debri to float right to left and reset on the right side of the screen.
+        public override void Think(TimeSpan elapsed_game_time)
+        {
+            time = time + elapsed_game_time.Milliseconds;
+
+            if (time > debri_speed)
+            {
+                x--;
+                if (x < 0)
+                {
+                    x = 31;
+                }
+
+                time = 0;
             }
         }
     }
@@ -62,7 +104,8 @@ namespace WastedSea
         SpriteBatch spriteBatch;
         Map main_map;
         Boat object_boat;
-        public Texture2D boat;           //Dynamic object textures.
+        public Texture2D boat, debris;           //Dynamic object textures.
+       
 
         //Variables to keep track of key releases.
         bool LEFT_PRESSED = false;
@@ -99,8 +142,22 @@ namespace WastedSea
             spriteBatch = new SpriteBatch(GraphicsDevice);
             main_map.Initialize(GraphicsDevice, Content);
             boat = Content.Load<Texture2D>(@"Boat");
+            debris = Content.Load<Texture2D>(@"Debris");
             object_boat = new Boat(10, 2, boat);
             dynamic_objects.Add(object_boat);
+
+            int MAX_DEBRIS = 10;
+            Random ran_number = new Random();
+            Debris new_debris;
+
+            for (int i = 0; i < MAX_DEBRIS; i++)
+            {
+                int ran_x = ran_number.Next(0, 31);
+                int ran_y = ran_number.Next(3, 6);
+                new_debris = new Debris(ran_x, ran_y, debris);
+                dynamic_objects.Add(new_debris);
+            }
+           
             // TODO: use this.Content to load your game content here
         }
 
@@ -152,7 +209,13 @@ namespace WastedSea
                 }
             }
 
+            //Allow our dynamic game objects their think cycle.
+            foreach (Object o in dynamic_objects)
+            {
+                o.Think(gameTime.ElapsedGameTime);
+            }
 
+           
             base.Update(gameTime);
         }
 
