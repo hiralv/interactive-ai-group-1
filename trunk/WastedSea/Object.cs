@@ -11,36 +11,45 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace WastedSea
 {
-    //The base class for all game objects that go into the object lists.
+    //The base class for all game objects that go doubleo the object lists.
     public class Object
     {
+        public int x_max = 31;
+        public int y_max = 23;
         public int x;
         public int y;
         public Texture2D texture;
         public double time;
         public double speed;
+        public SpriteBatch spriteBatch;
 
-        public Object(int x, int y, Texture2D texture)
+        public Object(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
         {
             this.texture = texture;
             this.x = x;
             this.y = y;
+            this.spriteBatch = spriteBatch;
+        }
+
+        public void Draw()
+        {
+            spriteBatch.Draw(texture, new Rectangle(x * 25, y * 25, texture.Width, texture.Height), Color.White);
         }
 
         public void MoveDown()
         {
             y++;
-            if (y > 23)
+            if (y > y_max)
             {
-                y = 23;
+                y = y_max;
             }
         }
         public void MoveRight()
         {
             x++;
-            if (x > 31)
+            if (x > x_max)
             {
-                x = 31;
+                x = x_max;
             }
         }
         public void MoveLeft()
@@ -60,9 +69,9 @@ namespace WastedSea
     {
         bool launched;
         bool moving_left;
-      
-        public Robot(int x, int y, Texture2D texture)
-            : base(x, y, texture)
+
+        public Robot(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
+            : base(x, y, texture, spriteBatch)
         {
             this.texture = texture;
             this.x = x;
@@ -128,8 +137,8 @@ namespace WastedSea
     //The moveable player-controlled boat.
     public class Boat : Object
     {
-        public Boat(int x, int y, Texture2D texture)
-            : base(x, y, texture)
+        public Boat(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
+            : base(x, y, texture, spriteBatch)
         {
             this.texture = texture;
             this.x = x;
@@ -142,14 +151,16 @@ namespace WastedSea
     {
         Random ran;
 
-        public Debris(int x, int y, Texture2D texture)
-            : base(x, y, texture)
+        public Debris(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
+            : base(x, y, texture, spriteBatch)
         {
             this.texture = texture;
             this.x = x;
             this.y = y;
             time = 0;
 
+
+            //ran = new Random(System.Convert.ToInt32(x) * System.Convert.ToInt32(y));
             ran = new Random(x * y);
             speed = ran.Next(300, 1000);
         }

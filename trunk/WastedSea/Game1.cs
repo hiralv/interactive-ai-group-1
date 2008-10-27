@@ -71,7 +71,7 @@ namespace WastedSea
             boat = Content.Load<Texture2D>(@"Boat");
             debris = Content.Load<Texture2D>(@"Debris");
             oil = Content.Load<Texture2D>(@"Oil");
-            object_boat = new Boat(10, 4, boat);
+            object_boat = new Boat(10, 4, boat, spriteBatch);
             dynamic_objects.Add(object_boat);
 
             Random ran_number = new Random();
@@ -83,7 +83,7 @@ namespace WastedSea
             {
                 int ran_x = ran_number.Next(0, 31);
                 int ran_y = ran_number.Next(5, 7);
-                new_debris = new Debris(ran_x, ran_y, debris);
+                new_debris = new Debris(ran_x, ran_y, debris, spriteBatch);
                 dynamic_objects.Add(new_debris);
             }
 
@@ -94,13 +94,13 @@ namespace WastedSea
             {
                 int ran_x = ran_number.Next(0, 31);
                 int ran_y = ran_number.Next(8, 23);
-                new_oil = new Object(ran_x, ran_y, oil);
+                new_oil = new Object(ran_x, ran_y, oil, spriteBatch);
                 dynamic_objects.Add(new_oil);
             }
 
             //Create robot.
             robot = Content.Load<Texture2D>(@"Robot");
-            object_robot = new Robot(35, 35, robot);
+            object_robot = new Robot(35, 35, robot, spriteBatch);
             dynamic_objects.Add(object_robot);
 
         }
@@ -193,12 +193,11 @@ namespace WastedSea
             foreach (Object o in dynamic_objects)
             {
                 spriteBatch.Begin();
-                spriteBatch.Draw(o.texture, new Rectangle(o.x * 25, o.y * 25, o.texture.Width, o.texture.Height), Color.White);
+                o.Draw();
                 spriteBatch.End();
             }
 
             DrawString("Score: 0", 0, 0);
-            
         }
 
         public void DrawString(string output, int x, int y)
