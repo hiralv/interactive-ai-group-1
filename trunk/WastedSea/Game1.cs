@@ -18,29 +18,39 @@ namespace WastedSea
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        SpriteFont Font1;
-        Vector2 FontPos;
+        //SpriteFont Font1;
+        //Vector2 FontPos;
 
-        List<Object> dynamic_objects;
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-        Map main_map;
-        Boat object_boat;
-        Robot object_robot;
-        public Texture2D boat, debris,oil,robot;           //Dynamic object textures.
+        //List<Object> dynamic_objects;
+        //GraphicsDeviceManager graphics;
+        //SpriteBatch spriteBatch;
+        //Map main_map;
+        //Boat object_boat;
+        //Robot object_robot;
+        //public Texture2D boat, debris,oil,robot;           //Dynamic object textures.
        
 
-        //Variables to keep track of key releases.
-        bool LEFT_PRESSED = false;
-        bool RIGHT_PRESSED = false;
-        bool SPACE_PRESSED = false;
+        ////Variables to keep track of key releases.
+        //bool LEFT_PRESSED = false;
+        //bool RIGHT_PRESSED = false;
+        //bool SPACE_PRESSED = false;
+
+
+        GraphicsDeviceManager graphics;
+        ScreenManager screenManager;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            main_map = new Map(this);
-            dynamic_objects = new List<Object>();
+
+            screenManager = new ScreenManager(this);
+            Components.Add(screenManager);
+
+            screenManager.AddScreen(new BackgroundScreen());
+            screenManager.AddScreen(new MainMenuScreen());
+            // main_map = new Map(this);
+            //dynamic_objects = new List<Object>();
         }
 
         /// <summary>
@@ -62,46 +72,46 @@ namespace WastedSea
         /// </summary>
         protected override void LoadContent()
         {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            Font1 = Content.Load<SpriteFont>("SpriteFont1");
-            FontPos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2, graphics.GraphicsDevice.Viewport.Height / 2);
+            //// Create a new SpriteBatch, which can be used to draw textures.
+            //spriteBatch = new SpriteBatch(GraphicsDevice);
+            //Font1 = Content.Load<SpriteFont>("SpriteFont1");
+            //FontPos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2, graphics.GraphicsDevice.Viewport.Height / 2);
 
-            main_map.Initialize(GraphicsDevice, Content);
-            boat = Content.Load<Texture2D>(@"Boat");
-            debris = Content.Load<Texture2D>(@"Debris");
-            oil = Content.Load<Texture2D>(@"Oil");
-            object_boat = new Boat(10, 4, boat, spriteBatch);
-            dynamic_objects.Add(object_boat);
+            //main_map.Initialize(GraphicsDevice, Content);
+            //boat = Content.Load<Texture2D>(@"Boat");
+            //debris = Content.Load<Texture2D>(@"Debris");
+            //oil = Content.Load<Texture2D>(@"Oil");
+            //object_boat = new Boat(10, 4, boat, spriteBatch);
+            //dynamic_objects.Add(object_boat);
 
-            Random ran_number = new Random();
+            //Random ran_number = new Random();
 
-            //Create all of the debris.
-            int MAX_DEBRIS = 10;
-            Debris new_debris;
-            for (int i = 0; i < MAX_DEBRIS; i++)
-            {
-                int ran_x = ran_number.Next(0, 31);
-                int ran_y = ran_number.Next(5, 7);
-                new_debris = new Debris(ran_x, ran_y, debris, spriteBatch);
-                dynamic_objects.Add(new_debris);
-            }
+            ////Create all of the debris.
+            //int MAX_DEBRIS = 10;
+            //Debris new_debris;
+            //for (int i = 0; i < MAX_DEBRIS; i++)
+            //{
+            //    int ran_x = ran_number.Next(0, 31);
+            //    int ran_y = ran_number.Next(5, 7);
+            //    new_debris = new Debris(ran_x, ran_y, debris, spriteBatch);
+            //    dynamic_objects.Add(new_debris);
+            //}
 
-            //Create all of the oil.
-            int MAX_OIL = 30;
-            Object new_oil;
-            for (int i = 0; i < MAX_OIL; i++)
-            {
-                int ran_x = ran_number.Next(0, 31);
-                int ran_y = ran_number.Next(8, 23);
-                new_oil = new Object(ran_x, ran_y, oil, spriteBatch);
-                dynamic_objects.Add(new_oil);
-            }
+            ////Create all of the oil.
+            //int MAX_OIL = 30;
+            //Object new_oil;
+            //for (int i = 0; i < MAX_OIL; i++)
+            //{
+            //    int ran_x = ran_number.Next(0, 31);
+            //    int ran_y = ran_number.Next(8, 23);
+            //    new_oil = new Object(ran_x, ran_y, oil, spriteBatch);
+            //    dynamic_objects.Add(new_oil);
+            //}
 
-            //Create robot.
-            robot = Content.Load<Texture2D>(@"Robot");
-            object_robot = new Robot(35, 35, robot, spriteBatch);
-            dynamic_objects.Add(object_robot);
+            ////Create robot.
+            //robot = Content.Load<Texture2D>(@"Robot");
+            //object_robot = new Robot(35, 35, robot, spriteBatch);
+            //dynamic_objects.Add(object_robot);
 
         }
 
@@ -125,52 +135,52 @@ namespace WastedSea
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            KeyboardState ks = Keyboard.GetState();
+            //KeyboardState ks = Keyboard.GetState();
 
-            if (ks.IsKeyDown(Keys.Right))       //Right arrow.
-            {
-                RIGHT_PRESSED = true;
-            }
-            else
-            {
-                if (RIGHT_PRESSED)
-                {
-                    object_boat.MoveRight();
-                    RIGHT_PRESSED = false;
-                }
-            }
+            //if (ks.IsKeyDown(Keys.Right))       //Right arrow.
+            //{
+            //    RIGHT_PRESSED = true;
+            //}
+            //else
+            //{
+            //    if (RIGHT_PRESSED)
+            //    {
+            //        object_boat.MoveRight();
+            //        RIGHT_PRESSED = false;
+            //    }
+            //}
 
-            if (ks.IsKeyDown(Keys.Left))            //Left arrow.
-            {
-                LEFT_PRESSED = true;
-            }
-            else
-            {
-                if (LEFT_PRESSED)
-                {
-                    object_boat.MoveLeft();
-                    LEFT_PRESSED = false;
-                }
-            }
+            //if (ks.IsKeyDown(Keys.Left))            //Left arrow.
+            //{
+            //    LEFT_PRESSED = true;
+            //}
+            //else
+            //{
+            //    if (LEFT_PRESSED)
+            //    {
+            //        object_boat.MoveLeft();
+            //        LEFT_PRESSED = false;
+            //    }
+            //}
 
-            if (ks.IsKeyDown(Keys.Space))            //Space bar.
-            {
-                SPACE_PRESSED = true;
-            }
-            else
-            {
-                if (SPACE_PRESSED)
-                {
-                    object_robot.Launch(object_boat.x, object_boat.y);
-                    SPACE_PRESSED = false;
-                }
-            }
+            //if (ks.IsKeyDown(Keys.Space))            //Space bar.
+            //{
+            //    SPACE_PRESSED = true;
+            //}
+            //else
+            //{
+            //    if (SPACE_PRESSED)
+            //    {
+            //        object_robot.Launch(object_boat.x, object_boat.y);
+            //        SPACE_PRESSED = false;
+            //    }
+            //}
 
-            //Allow our dynamic game objects their think cycle.
-            foreach (Object o in dynamic_objects)
-            {
-                o.Think(gameTime.ElapsedGameTime);
-            }
+            ////Allow our dynamic game objects their think cycle.
+            //foreach (Object o in dynamic_objects)
+            //{
+            //    o.Think(gameTime.ElapsedGameTime);
+            //}
 
            
             base.Update(gameTime);
@@ -184,31 +194,31 @@ namespace WastedSea
         {
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            main_map.Draw(spriteBatch);
+            //main_map.Draw(spriteBatch);
 
             base.Draw(gameTime);
 
             
 
-            foreach (Object o in dynamic_objects)
-            {
-                spriteBatch.Begin();
-                o.Draw();
-                spriteBatch.End();
-            }
+            //foreach (Object o in dynamic_objects)
+            //{
+            //    spriteBatch.Begin();
+            //    o.Draw();
+            //    spriteBatch.End();
+            //}
 
-            DrawString("Score: 0", 0, 0);
+            //DrawString("Score: 0", 0, 0);
         }
 
-        public void DrawString(string output, int x, int y)
-        {
-            spriteBatch.Begin();
-            FontPos.X = x;
-            FontPos.Y = y;
-            //Vector2 FontOrigin = Font1.MeasureString(output) / 2;
-            Vector2 FontOrigin = new Vector2(0, 0);
-            spriteBatch.DrawString(Font1, output, FontPos, Color.Black, 0, FontOrigin, 1.0f, SpriteEffects.None, 0.5f);
-            spriteBatch.End();
-        }
+        //public void DrawString(string output, int x, int y)
+        //{
+        //    spriteBatch.Begin();
+        //    FontPos.X = x;
+        //    FontPos.Y = y;
+        //    //Vector2 FontOrigin = Font1.MeasureString(output) / 2;
+        //    Vector2 FontOrigin = new Vector2(0, 0);
+        //    spriteBatch.DrawString(Font1, output, FontPos, Color.Black, 0, FontOrigin, 1.0f, SpriteEffects.None, 0.5f);
+        //    spriteBatch.End();
+        //}
     }
 }
