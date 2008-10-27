@@ -74,6 +74,8 @@ namespace WastedSea
     {
         bool launched;
         bool moving_left;
+        int pixels_x;
+        int pixels_y;
 
         public Robot(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
@@ -81,6 +83,8 @@ namespace WastedSea
             this.texture = texture;
             this.x = x;
             this.y = y;
+            pixels_x = x * 25;
+            pixels_y = y * 25;
             launched = false;
             moving_left = true;
             time = 0;
@@ -137,6 +141,11 @@ namespace WastedSea
                 }
             }
         }
+
+        //public override void Draw()
+        //{
+        //    spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
+        //}
     }
 
     //The moveable player-controlled boat.
