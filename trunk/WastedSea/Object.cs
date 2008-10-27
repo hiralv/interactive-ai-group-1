@@ -16,11 +16,16 @@ namespace WastedSea
     {
         public int x_max = 31;
         public int y_max = 23;
+
         public int x;
         public int y;
+
+        public int offset_x;    //Converts the grid coordinates to pixel coordinates for smoother animations.
+        public int offset_y;
+
         public Texture2D texture;
-        public double time;
-        public double speed;
+        public int time;
+        public int speed;
         public SpriteBatch spriteBatch;
 
         public Object(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
@@ -31,7 +36,7 @@ namespace WastedSea
             this.spriteBatch = spriteBatch;
         }
 
-        public void Draw()
+        public virtual void Draw()
         {
             spriteBatch.Draw(texture, new Rectangle(x * 25, y * 25, texture.Width, texture.Height), Color.White);
         }
@@ -150,6 +155,7 @@ namespace WastedSea
     public class Debris : Object
     {
         Random ran;
+        int pixels_x;
 
         public Debris(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
@@ -158,29 +164,32 @@ namespace WastedSea
             this.x = x;
             this.y = y;
             time = 0;
+            pixels_x = x * 25;
 
-
-            //ran = new Random(System.Convert.ToInt32(x) * System.Convert.ToInt32(y));
             ran = new Random(x * y);
-            speed = ran.Next(300, 1000);
+            speed = ran.Next(1, 10);
         }
 
         //Causes the debri to float right to left and reset on the right side of the screen.
         public override void Think(TimeSpan elapsed_game_time)
         {
-            time = time + elapsed_game_time.Milliseconds;
+            time += (elapsed_game_time.Milliseconds + speed);
 
-            if (time > speed)
+            if (time > 25)
             {
-                //Moves left, but wraps.
-                x--;
-                if (x < 0)
-                {
-                    x = 31;
-                }
-
-                time = 0;
+                pixels_x -= time / 25;
+                time = time % 25;
             }
+
+            if (pixels_x < 0)
+            {
+                pixels_x = 31 * 25;
+            }
+        }
+
+        public override void Draw()
+        {
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * 25, texture.Width, texture.Height), Color.White);
         }
     }
 }
