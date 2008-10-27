@@ -11,88 +11,7 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace WastedSea
 {
-    //The base class for all game objects that go into the object lists.
-    public class Object
-    {
-        public int x;
-        public int y;
-        public Texture2D texture;
-
-        public Object(int x, int y, Texture2D texture)
-        {
-            this.texture = texture;
-            this.x = x;
-            this.y = y;
-        }
-
-        public virtual void Think(TimeSpan elapsed_game_time) { }
-    }
-
-    //The moveable player-controlled boat.
-    public class Boat : Object
-    {
-        public Boat(int x, int y, Texture2D texture) : base(x,y,texture)
-        {
-            this.texture = texture;
-            this.x = x;
-            this.y = y;
-        }
-
-        public void MoveRight()
-        {
-            x++;
-            if (x > 31)
-            {
-                x = 31;
-            }
-        }
-
-        public void MoveLeft()
-        {
-            x--;
-            if (x < 0)
-            {
-                x = 0;
-            }
-        }
-    }
-
-    //Floating debris that require our agent to use D* on the way home.
-    public class Debris : Object
-    {
-        double debri_speed;                  
-        double time;
-        Random ran;
-
-        public Debris(int x, int y, Texture2D texture)
-            : base(x, y, texture)
-        {
-            this.texture = texture;
-            this.x = x;
-            this.y = y;
-            time = 0;
-
-            ran = new Random(x*y);
-            debri_speed = ran.Next(300,1000);
-        }
-
-        //Causes the debri to float right to left and reset on the right side of the screen.
-        public override void Think(TimeSpan elapsed_game_time)
-        {
-            time = time + elapsed_game_time.Milliseconds;
-
-            if (time > debri_speed)
-            {
-                x--;
-                if (x < 0)
-                {
-                    x = 31;
-                }
-
-                time = 0;
-            }
-        }
-    }
+    
 
     /// <summary>
     /// This is the main type for your game
@@ -104,12 +23,14 @@ namespace WastedSea
         SpriteBatch spriteBatch;
         Map main_map;
         Boat object_boat;
-        public Texture2D boat, debris,oil;           //Dynamic object textures.
+        Robot object_robot;
+        public Texture2D boat, debris,oil,robot;           //Dynamic object textures.
        
 
         //Variables to keep track of key releases.
         bool LEFT_PRESSED = false;
         bool RIGHT_PRESSED = false;
+        bool SPACE_PRESSED = false;
 
         public Game1()
         {
@@ -149,9 +70,9 @@ namespace WastedSea
 
             Random ran_number = new Random();
 
+            //Create all of the debris.
             int MAX_DEBRIS = 10;
             Debris new_debris;
-
             for (int i = 0; i < MAX_DEBRIS; i++)
             {
                 int ran_x = ran_number.Next(0, 31);
@@ -160,6 +81,7 @@ namespace WastedSea
                 dynamic_objects.Add(new_debris);
             }
 
+            //Create all of the oil.
             int MAX_OIL = 30;
             Object new_oil;
             for (int i = 0; i < MAX_OIL; i++)
@@ -169,8 +91,12 @@ namespace WastedSea
                 new_oil = new Object(ran_x, ran_y, oil);
                 dynamic_objects.Add(new_oil);
             }
-           
-            // TODO: use this.Content to load your game content here
+
+            //Create robot.
+            robot = Content.Load<Texture2D>(@"Robot");
+            object_robot = new Robot(35, 35, robot);
+            dynamic_objects.Add(object_robot);
+
         }
 
         /// <summary>
@@ -195,7 +121,7 @@ namespace WastedSea
 
             KeyboardState ks = Keyboard.GetState();
 
-            if (ks.IsKeyDown(Keys.Right))
+            if (ks.IsKeyDown(Keys.Right))       //Right arrow.
             {
                 RIGHT_PRESSED = true;
             }
@@ -208,7 +134,7 @@ namespace WastedSea
                 }
             }
 
-            if (ks.IsKeyDown(Keys.Left))
+            if (ks.IsKeyDown(Keys.Left))            //Left arrow.
             {
                 LEFT_PRESSED = true;
             }
@@ -218,6 +144,19 @@ namespace WastedSea
                 {
                     object_boat.MoveLeft();
                     LEFT_PRESSED = false;
+                }
+            }
+
+            if (ks.IsKeyDown(Keys.Space))            //Space bar.
+            {
+                SPACE_PRESSED = true;
+            }
+            else
+            {
+                if (SPACE_PRESSED)
+                {
+                    object_robot.Launch(object_boat.x, object_boat.y);
+                    SPACE_PRESSED = false;
                 }
             }
 
