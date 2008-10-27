@@ -18,6 +18,9 @@ namespace WastedSea
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        SpriteFont Font1;
+        Vector2 FontPos;
+
         List<Object> dynamic_objects;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -61,11 +64,14 @@ namespace WastedSea
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            Font1 = Content.Load<SpriteFont>("SpriteFont1");
+            FontPos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2, graphics.GraphicsDevice.Viewport.Height / 2);
+
             main_map.Initialize(GraphicsDevice, Content);
             boat = Content.Load<Texture2D>(@"Boat");
             debris = Content.Load<Texture2D>(@"Debris");
             oil = Content.Load<Texture2D>(@"Oil");
-            object_boat = new Boat(10, 2, boat);
+            object_boat = new Boat(10, 4, boat);
             dynamic_objects.Add(object_boat);
 
             Random ran_number = new Random();
@@ -76,7 +82,7 @@ namespace WastedSea
             for (int i = 0; i < MAX_DEBRIS; i++)
             {
                 int ran_x = ran_number.Next(0, 31);
-                int ran_y = ran_number.Next(3, 6);
+                int ran_y = ran_number.Next(5, 7);
                 new_debris = new Debris(ran_x, ran_y, debris);
                 dynamic_objects.Add(new_debris);
             }
@@ -87,7 +93,7 @@ namespace WastedSea
             for (int i = 0; i < MAX_OIL; i++)
             {
                 int ran_x = ran_number.Next(0, 31);
-                int ran_y = ran_number.Next(7, 24);
+                int ran_y = ran_number.Next(8, 23);
                 new_oil = new Object(ran_x, ran_y, oil);
                 dynamic_objects.Add(new_oil);
             }
@@ -182,12 +188,28 @@ namespace WastedSea
 
             base.Draw(gameTime);
 
+            
+
             foreach (Object o in dynamic_objects)
             {
                 spriteBatch.Begin();
                 spriteBatch.Draw(o.texture, new Rectangle(o.x * 25, o.y * 25, o.texture.Width, o.texture.Height), Color.White);
                 spriteBatch.End();
             }
+
+            DrawString("Score: 0", 0, 0);
+            
+        }
+
+        public void DrawString(string output, int x, int y)
+        {
+            spriteBatch.Begin();
+            FontPos.X = x;
+            FontPos.Y = y;
+            //Vector2 FontOrigin = Font1.MeasureString(output) / 2;
+            Vector2 FontOrigin = new Vector2(0, 0);
+            spriteBatch.DrawString(Font1, output, FontPos, Color.Black, 0, FontOrigin, 1.0f, SpriteEffects.None, 0.5f);
+            spriteBatch.End();
         }
     }
 }
