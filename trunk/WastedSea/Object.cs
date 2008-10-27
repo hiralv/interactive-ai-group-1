@@ -59,7 +59,8 @@ namespace WastedSea
     public class Robot : Object
     {
         bool launched;
-
+        bool moving_left;
+      
         public Robot(int x, int y, Texture2D texture)
             : base(x, y, texture)
         {
@@ -67,6 +68,7 @@ namespace WastedSea
             this.x = x;
             this.y = y;
             launched = false;
+            moving_left = true;
             time = 0;
             speed = 100;
         }
@@ -79,7 +81,6 @@ namespace WastedSea
         }
 
         
-
         public override void Think(TimeSpan elapsed_game_time)
         {
             if (launched)
@@ -89,8 +90,36 @@ namespace WastedSea
                 if (time > speed)
                 {
                     MoveDown();
-
                     time = 0;
+                
+
+                    if (y == 23)
+                    {
+                        if (moving_left)
+                        {
+                            if (x == 0)
+                            {
+                                moving_left = false;
+                                MoveRight();
+                            }
+                            else
+                            {
+                                MoveLeft();
+                            }
+                        }
+                        else
+                        {
+                            if (x == 31)
+                            {
+                                moving_left = true;
+                                MoveLeft();
+                            }
+                            else
+                            {
+                                MoveRight();
+                            }
+                        }
+                    }
                 }
             }
         }
