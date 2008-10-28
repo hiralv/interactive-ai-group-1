@@ -40,7 +40,7 @@ namespace WastedSea
         Robot object_robot;
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
-        public Texture2D boat, debris, oil, robot;
+        public Texture2D boat, debris, oil, robot, bird;
 
         Random random = new Random();
 
@@ -83,6 +83,9 @@ namespace WastedSea
             oil = content.Load<Texture2D>(@"Oil");
             object_boat = new Boat(10, 4, boat, spriteBatch);
             dynamic_objects.Add(object_boat);
+
+            bird = content.Load<Texture2D>(@"Bird");
+            dynamic_objects.Add(new Debris(0, 1, bird, spriteBatch));
 
             Random ran_number = new Random();
 
