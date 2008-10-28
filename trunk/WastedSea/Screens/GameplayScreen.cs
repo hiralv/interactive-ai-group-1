@@ -110,7 +110,7 @@ namespace WastedSea
             for (int i = 0; i < MAX_OIL; i++)
             {
                 int ran_x = ran_number.Next(0, 31);
-                int ran_y = ran_number.Next(8, 23);
+                int ran_y = ran_number.Next(8, 22);
                 new_oil = new Object(ran_x, ran_y, oil, spriteBatch);
                 dynamic_objects.Add(new_oil);
             }

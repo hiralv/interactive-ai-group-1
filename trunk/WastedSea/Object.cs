@@ -22,7 +22,7 @@ namespace WastedSea
     public class Object
     {
         public int x_max = 31;
-        public int y_max = 23;
+        public int y_max = 22;
         public int grid_to_pixels = 25;
 
         public int x;
