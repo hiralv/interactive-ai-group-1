@@ -23,6 +23,10 @@ namespace WastedSea
         public int offset_x;    //Converts the grid coordinates to pixel coordinates for smoother animations.
         public int offset_y;
 
+        public Random ran;
+        public int pixels_x;
+        public int pixels_y;
+
         public Texture2D texture;
         public int time;
         public int speed;
@@ -33,7 +37,9 @@ namespace WastedSea
             this.texture = texture;
             this.x = x;
             this.y = y;
-            this.spriteBatch = spriteBatch;
+            this.spriteBatch = spriteBatch;     
+            pixels_x = x * 25;                  //Starting pixel locations of object.
+            pixels_y = y * 25;                  //Starting pixel locations of object.
         }
 
         public virtual void Draw()
@@ -41,28 +47,41 @@ namespace WastedSea
             spriteBatch.Draw(texture, new Rectangle(x * 25, y * 25, texture.Width, texture.Height), Color.White);
         }
 
-        public void MoveDown()
+        public void MoveDown(TimeSpan elapsed_game_time)
         {
-            y++;
-            if (y > y_max)
+            time += (elapsed_game_time.Milliseconds + speed);
+
+            pixels_y += time / 25;
+            time = time % 25;
+
+            if (pixels_y > 23 * 25)
             {
-                y = y_max;
+                pixels_y = 23 * 25;
             }
         }
-        public void MoveRight()
+        public void MoveLeft(TimeSpan elapsed_game_time)
         {
-            x++;
-            if (x > x_max)
+            time += (elapsed_game_time.Milliseconds + speed);
+
+            pixels_x -= time / 25;
+            time = time % 25;
+
+            if (pixels_x < 0)
             {
-                x = x_max;
+                pixels_x = 0;
             }
         }
-        public void MoveLeft()
+
+        public void MoveRight(TimeSpan elapsed_game_time)
         {
-            x--;
-            if (x < 0)
+            time += (elapsed_game_time.Milliseconds + speed);
+
+            pixels_x += time / 25;
+            time = time % 25;
+
+            if (pixels_x > 31 * 25)
             {
-                x = 0;
+                pixels_x = 31 * 25;
             }
         }
 
@@ -74,17 +93,11 @@ namespace WastedSea
     {
         bool launched;
         bool moving_left;
-        int pixels_x;
-        int pixels_y;
 
         public Robot(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {
-            this.texture = texture;
-            this.x = x;
-            this.y = y;
-            pixels_x = x * 25;
-            pixels_y = y * 25;
+            
             launched = false;
             moving_left = true;
             time = 0;
@@ -95,6 +108,8 @@ namespace WastedSea
         {
             this.x = x;
             this.y = y + 1;
+            pixels_x = x * 25;
+            pixels_y = y * 25;
             launched = true;
         }
 
@@ -103,49 +118,43 @@ namespace WastedSea
         {
             if (launched)
             {
-                time = time + elapsed_game_time.Milliseconds;
-
-                if (time > speed)
+                MoveDown(elapsed_game_time);
+                time = 0;
+            
+                if (pixels_y == 23 * 25)
                 {
-                    MoveDown();
-                    time = 0;
-                
-
-                    if (y == 23)
+                    if (moving_left)
                     {
-                        if (moving_left)
+                        if (pixels_x == 0)
                         {
-                            if (x == 0)
-                            {
-                                moving_left = false;
-                                MoveRight();
-                            }
-                            else
-                            {
-                                MoveLeft();
-                            }
+                            moving_left = false;
+                            MoveRight(elapsed_game_time);
                         }
                         else
                         {
-                            if (x == 31)
-                            {
-                                moving_left = true;
-                                MoveLeft();
-                            }
-                            else
-                            {
-                                MoveRight();
-                            }
+                            MoveLeft(elapsed_game_time);
                         }
                     }
-                }
+                    else
+                    {
+                        if (pixels_x == 31 * 25)
+                        {
+                            moving_left = true;
+                            MoveLeft(elapsed_game_time);
+                        }
+                        else
+                        {
+                            MoveRight(elapsed_game_time);
+                        }
+                    }
+                }   
             }
         }
 
-        //public override void Draw()
-        //{
-        //    spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
-        //}
+        public override void Draw()
+        {
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
+        }
     }
 
     //The moveable player-controlled boat.
@@ -157,15 +166,22 @@ namespace WastedSea
             this.texture = texture;
             this.x = x;
             this.y = y;
+            time = 0;
+            pixels_x = x * 25;
+            speed = 2;
+        }
+
+
+
+        public override void Draw()
+        {
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * 25, texture.Width, texture.Height), Color.White);
         }
     }
 
     //Floating debris that require our agent to use D* on the way home.
     public class Debris : Object
     {
-        Random ran;
-        int pixels_x;
-
         public Debris(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {
@@ -184,11 +200,8 @@ namespace WastedSea
         {
             time += (elapsed_game_time.Milliseconds + speed);
 
-            if (time > 25)
-            {
-                pixels_x -= time / 25;
-                time = time % 25;
-            }
+            pixels_x -= time / 25;
+            time = time % 25;
 
             if (pixels_x < 0)
             {

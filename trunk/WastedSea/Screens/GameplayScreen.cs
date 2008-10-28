@@ -45,8 +45,6 @@ namespace WastedSea
         Random random = new Random();
 
         //Variables to keep track of key releases.
-        bool LEFT_PRESSED = false;
-        bool RIGHT_PRESSED = false;
         bool SPACE_PRESSED = false;
 
         #endregion
@@ -158,30 +156,14 @@ namespace WastedSea
 
                 if (ks.IsKeyDown(Keys.Right))       //Right arrow.
                 {
-                    RIGHT_PRESSED = true;
-                }
-                else
-                {
-                    if (RIGHT_PRESSED)
-                    {
-                        object_boat.MoveRight();
-                        RIGHT_PRESSED = false;
-                    }
+                    object_boat.MoveRight(gameTime.ElapsedGameTime);
                 }
 
                 if (ks.IsKeyDown(Keys.Left))            //Left arrow.
                 {
-                    LEFT_PRESSED = true;
+                    object_boat.MoveLeft(gameTime.ElapsedGameTime);
                 }
-                else
-                {
-                    if (LEFT_PRESSED)
-                    {
-                        object_boat.MoveLeft();
-                        LEFT_PRESSED = false;
-                    }
-                }
-
+               
                 if (ks.IsKeyDown(Keys.Space))            //Space bar.
                 {
                     SPACE_PRESSED = true;
