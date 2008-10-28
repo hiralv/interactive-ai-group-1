@@ -11,6 +11,13 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace WastedSea
 {
+    public enum Direction
+    {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
+    }
     //The base class for all game objects that go doubleo the object lists.
     public class Object
     {
@@ -33,6 +40,8 @@ namespace WastedSea
         public int speed;
         public SpriteBatch spriteBatch;
 
+        public Direction current_dir;
+
         public Object(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
         {
             this.texture = texture;
@@ -41,6 +50,8 @@ namespace WastedSea
             this.spriteBatch = spriteBatch;     
             pixels_x = x * grid_to_pixels;                  //Starting pixel locations of object.
             pixels_y = y * grid_to_pixels;                  //Starting pixel locations of object.
+            time = 0;
+            ran = new Random(x * y);
         }
 
         public virtual void Draw()
@@ -101,7 +112,6 @@ namespace WastedSea
             
             launched = false;
             moving_left = true;
-            time = 0;
             speed = 100;
         }
 
@@ -164,19 +174,61 @@ namespace WastedSea
         public Boat(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {
-            this.texture = texture;
-            this.x = x;
-            this.y = y;
-            time = 0;
-            pixels_x = x * grid_to_pixels;
             speed = 2;
         }
-
-
 
         public override void Draw()
         {
             spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
+        }
+    }
+
+    //The bird.
+    public class Bird : Object
+    {
+        public Bird(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
+            : base(x, y, texture, spriteBatch)
+        {
+            speed = -3;
+            current_dir = Direction.UP;
+        }
+
+        public override void Think(TimeSpan elapsed_game_time)
+        {
+            time += (elapsed_game_time.Milliseconds + speed);
+
+            pixels_x -= time / grid_to_pixels;
+
+            //if (pixels_y / 25 < y)
+            //{
+            //    current_dir = Direction.DOWN;
+            //}
+
+            //if (pixels_y / 25 > y)
+            //{
+            //    current_dir = Direction.UP;
+            //}
+
+            //if (current_dir == Direction.UP)
+            //{
+            //    pixels_y -= ran.Next(0,2);
+            //}
+            //else
+            //{
+            //    pixels_y += ran.Next(0, 2);
+            //}
+
+            time = time % grid_to_pixels;
+
+            if (pixels_x < 0)
+            {
+                pixels_x = x_max * grid_to_pixels;
+            }
+        }
+
+        public override void Draw()
+        {
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
         }
     }
 
@@ -186,13 +238,6 @@ namespace WastedSea
         public Debris(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {
-            this.texture = texture;
-            this.x = x;
-            this.y = y;
-            time = 0;
-            pixels_x = x * grid_to_pixels;
-
-            ran = new Random(x * y);
             speed = ran.Next(1, 10);
         }
 

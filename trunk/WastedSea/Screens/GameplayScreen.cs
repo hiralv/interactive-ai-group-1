@@ -84,8 +84,7 @@ namespace WastedSea
             object_boat = new Boat(10, 4, boat, spriteBatch);
             dynamic_objects.Add(object_boat);
 
-            bird = content.Load<Texture2D>(@"Bird");
-            dynamic_objects.Add(new Debris(0, 1, bird, spriteBatch));
+           
 
             Random ran_number = new Random();
 
@@ -99,6 +98,11 @@ namespace WastedSea
                 new_debris = new Debris(ran_x, ran_y, debris, spriteBatch);
                 dynamic_objects.Add(new_debris);
             }
+
+            bird = content.Load<Texture2D>(@"Bird");
+            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(0, 2), bird, spriteBatch));
+            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(0, 2), bird, spriteBatch));
+            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(0, 2), bird, spriteBatch));
 
             //Create all of the oil.
             int MAX_OIL = 30;
