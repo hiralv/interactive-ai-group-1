@@ -172,7 +172,7 @@ namespace WastedSea
                 {
                     if (SPACE_PRESSED)
                     {
-                        object_robot.Launch(object_boat.x, object_boat.y);
+                        object_robot.Launch(object_boat.pixels_x / 25, object_boat.pixels_y / 25);
                         SPACE_PRESSED = false;
                     }
                 }

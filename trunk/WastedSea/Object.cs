@@ -16,6 +16,7 @@ namespace WastedSea
     {
         public int x_max = 31;
         public int y_max = 23;
+        public int grid_to_pixels = 25;
 
         public int x;
         public int y;
@@ -38,33 +39,33 @@ namespace WastedSea
             this.x = x;
             this.y = y;
             this.spriteBatch = spriteBatch;     
-            pixels_x = x * 25;                  //Starting pixel locations of object.
-            pixels_y = y * 25;                  //Starting pixel locations of object.
+            pixels_x = x * grid_to_pixels;                  //Starting pixel locations of object.
+            pixels_y = y * grid_to_pixels;                  //Starting pixel locations of object.
         }
 
         public virtual void Draw()
         {
-            spriteBatch.Draw(texture, new Rectangle(x * 25, y * 25, texture.Width, texture.Height), Color.White);
+            spriteBatch.Draw(texture, new Rectangle(x * grid_to_pixels, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
         }
 
         public void MoveDown(TimeSpan elapsed_game_time)
         {
             time += (elapsed_game_time.Milliseconds + speed);
 
-            pixels_y += time / 25;
-            time = time % 25;
+            pixels_y += time / grid_to_pixels;
+            time = time % grid_to_pixels;
 
-            if (pixels_y > 23 * 25)
+            if (pixels_y > y_max * grid_to_pixels)
             {
-                pixels_y = 23 * 25;
+                pixels_y = y_max * grid_to_pixels;
             }
         }
         public void MoveLeft(TimeSpan elapsed_game_time)
         {
             time += (elapsed_game_time.Milliseconds + speed);
 
-            pixels_x -= time / 25;
-            time = time % 25;
+            pixels_x -= time / grid_to_pixels;
+            time = time % grid_to_pixels;
 
             if (pixels_x < 0)
             {
@@ -76,12 +77,12 @@ namespace WastedSea
         {
             time += (elapsed_game_time.Milliseconds + speed);
 
-            pixels_x += time / 25;
-            time = time % 25;
+            pixels_x += time / grid_to_pixels;
+            time = time % grid_to_pixels;
 
-            if (pixels_x > 31 * 25)
+            if (pixels_x > x_max * grid_to_pixels)
             {
-                pixels_x = 31 * 25;
+                pixels_x = x_max * grid_to_pixels;
             }
         }
 
@@ -108,8 +109,8 @@ namespace WastedSea
         {
             this.x = x;
             this.y = y + 1;
-            pixels_x = x * 25;
-            pixels_y = y * 25;
+            pixels_x = x * grid_to_pixels;
+            pixels_y = y * grid_to_pixels;
             launched = true;
         }
 
@@ -121,7 +122,7 @@ namespace WastedSea
                 MoveDown(elapsed_game_time);
                 time = 0;
             
-                if (pixels_y == 23 * 25)
+                if (pixels_y == y_max * grid_to_pixels)
                 {
                     if (moving_left)
                     {
@@ -137,7 +138,7 @@ namespace WastedSea
                     }
                     else
                     {
-                        if (pixels_x == 31 * 25)
+                        if (pixels_x == x_max * grid_to_pixels)
                         {
                             moving_left = true;
                             MoveLeft(elapsed_game_time);
@@ -167,7 +168,7 @@ namespace WastedSea
             this.x = x;
             this.y = y;
             time = 0;
-            pixels_x = x * 25;
+            pixels_x = x * grid_to_pixels;
             speed = 2;
         }
 
@@ -175,7 +176,7 @@ namespace WastedSea
 
         public override void Draw()
         {
-            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * 25, texture.Width, texture.Height), Color.White);
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
         }
     }
 
@@ -189,7 +190,7 @@ namespace WastedSea
             this.x = x;
             this.y = y;
             time = 0;
-            pixels_x = x * 25;
+            pixels_x = x * grid_to_pixels;
 
             ran = new Random(x * y);
             speed = ran.Next(1, 10);
@@ -200,18 +201,18 @@ namespace WastedSea
         {
             time += (elapsed_game_time.Milliseconds + speed);
 
-            pixels_x -= time / 25;
-            time = time % 25;
+            pixels_x -= time / grid_to_pixels;
+            time = time % grid_to_pixels;
 
             if (pixels_x < 0)
             {
-                pixels_x = 31 * 25;
+                pixels_x = x_max * grid_to_pixels;
             }
         }
 
         public override void Draw()
         {
-            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * 25, texture.Width, texture.Height), Color.White);
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
         }
     }
 }
