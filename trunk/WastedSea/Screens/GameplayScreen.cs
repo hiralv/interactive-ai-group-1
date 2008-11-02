@@ -94,7 +94,7 @@ namespace WastedSea
             Random ran_number = new Random();
 
             //Create all of the debris.
-            int MAX_DEBRIS = 100;
+            int MAX_DEBRIS = 200;
             Debris new_debris;
             for (int i = 0; i < MAX_DEBRIS; i++)
             {

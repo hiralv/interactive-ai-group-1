@@ -82,7 +82,8 @@ namespace WastedSea
             goal = node_array[end_y, end_x];
             start = node_array[start_y, start_x];
             Insert(goal, 0);
-            k_min = 0;
+
+            int k_min = 0;
 
             while (start.tag != Tag.CLOSED && k_min != -1)
             {
@@ -91,6 +92,7 @@ namespace WastedSea
 
             current = start;
             STARTED = true;
+            this.k_min = 0;
         }
 
         public Square Think(int[,] actual_cost_array)
@@ -107,8 +109,6 @@ namespace WastedSea
                 //D* will loop till it can make one move.
                 while (!found_move) 
                 {
-                    Square next_state = current.parent;
-
                     int estimated_cost = current.Hcost - current.parent.Hcost;
                     int actual_cost = actual_cost_array[current.parent.i, current.parent.j];
 
@@ -130,8 +130,7 @@ namespace WastedSea
                             }
                             else
                             {
-                                //Error,  path cannot be found.
-                                            
+                                //Error,  path cannot be found.    
                                 break;
                             }
                         }
@@ -140,6 +139,7 @@ namespace WastedSea
                     move = current;
                     node_list.Add(current);         //Make the move.
                     current = current.parent;
+                   
                     UpdateWithPercepts(current, actual_cost_array);
                     found_move = true;
                 }
@@ -183,7 +183,7 @@ namespace WastedSea
             {
                 for (int x = x_start; x < x_end; x++)
                 {
-                    if (actual_cost_array[y, x] < 2)
+                    if (actual_cost_array[y, x] == 0)
                     {
                         node_array[y, x].Gcost = 1;
                     }
@@ -221,7 +221,7 @@ namespace WastedSea
                     }
                 }
             }
-            else if (k_old == X.Hcost)
+            if (k_old == X.Hcost)
             {
                 foreach (Square Y in neighbors)
                 {
@@ -271,7 +271,7 @@ namespace WastedSea
         /** Updates the cost function for a particular node arc. */
         int ModifyCost(Square X, Square Y, int cval)
         {
-            Y.Gcost = cval;
+            X.Gcost = cval;
 
             if (X.tag == Tag.CLOSED)
             {
@@ -344,7 +344,7 @@ namespace WastedSea
             node_array[state.i, state.j].tag = Tag.CLOSED;
         }
 
-        /** ... */
+        /** Returns the minimum of two values. */
         int Min(int x, int y)
         {
             if (x < y)
@@ -355,10 +355,11 @@ namespace WastedSea
             return y;
         }
 
-        /** Cost funtion. */
+        /** Returns the arc cost from y to x. */
         int c(Square X, Square Y)
         {
-            return node_array[Y.i, Y.j].Gcost;
+            return node_array[X.i, X.j].Gcost;
+            //return 1;
         }
 
         /** Compares to squares by (x,y) location. */
@@ -384,44 +385,28 @@ namespace WastedSea
             if ((x + 1) <= 31)
             {
                 Square square = node_array[y, x + 1];
-                // if (square.tag != Tag.CLOSED && square.tag != Tag.OPEN)
-                //{
-                //square.parent = current;
                 successors.Add(square);
-                // }
             }
 
             //Left
             if ((x - 1) >= 0)
             {
                 Square square = node_array[y, x - 1];
-                //if (square.tag != Tag.CLOSED && square.tag != Tag.OPEN)
-                //{
-                // square.parent = current;
                 successors.Add(square);
-                //}
             }
 
             //Up
             if ((y + 1) <= 23)
             {
                 Square square = node_array[y + 1, x];
-                //if (square.tag != Tag.CLOSED && square.tag != Tag.OPEN)
-                //{
-                // square.parent = current;
                 successors.Add(square);
-                //}
             }
 
             //Down
             if ((y - 1) >= 0)
             {
                 Square square = node_array[y - 1, x];
-                //if (square.tag != Tag.CLOSED && square.tag != Tag.OPEN)
-                //{
-                //square.parent = current;
                 successors.Add(square);
-                //}
             }
 
             return successors;
