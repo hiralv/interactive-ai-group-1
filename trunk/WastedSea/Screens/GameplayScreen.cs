@@ -31,6 +31,7 @@ namespace WastedSea
     {
         #region Fields
 
+        int dstar_timer;
         ContentManager content;
         SpriteBatch spriteBatch;
         SpriteFont Font1;
@@ -42,6 +43,7 @@ namespace WastedSea
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
         public Texture2D boat, debris, oil, robot, bird;
+        int[,] actual_cost_array;                           //Stores the sensed data to send to the D*.
 
         Random random = new Random();
 
@@ -64,6 +66,7 @@ namespace WastedSea
 
             main_map = new Map(cur);
             dynamic_objects = new List<Object>();
+            dstar_timer = 0;
         }
 
 
@@ -113,7 +116,7 @@ namespace WastedSea
             {
                 int ran_x = ran_number.Next(0, 31);
                 int ran_y = ran_number.Next(8, 22);
-                new_oil = new Object(ran_x, ran_y, oil, spriteBatch);
+                new_oil = new Oil(ran_x, ran_y, oil, spriteBatch);
                 dynamic_objects.Add(new_oil);
             }
 
@@ -122,7 +125,7 @@ namespace WastedSea
             object_robot = new Robot(35, 35, robot, spriteBatch);
             dynamic_objects.Add(object_robot);
 
-            dstar = new DStar(main_map.map_type_array);
+            dstar = new DStar();
 
             // A real game would probably have more content than this sample, so
             // it would take longer to load. We simulate that by delaying for a
@@ -159,6 +162,8 @@ namespace WastedSea
                                                        bool coveredByOtherScreen)
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+
+            dstar_timer += gameTime.ElapsedGameTime.Milliseconds;
 
             if (IsActive)
             {
@@ -197,15 +202,30 @@ namespace WastedSea
                     {
                         if (dstar.STARTED)
                         {
-                            Square move = dstar.Think(main_map.map_type_array);
+
                         }
                         else
                         {
                             object_robot.Retun();
                             //Run D* and bring robot home.
-                            dstar.Start(object_robot.x, object_robot.y, object_boat.x, object_boat.y);
+                            dstar.Start(object_robot.pixels_x / 25, object_robot.pixels_y / 25, object_boat.pixels_x / 25, object_boat.pixels_y / 25);
                         }
                         UP_PRESSED = false;
+                    }
+                }
+
+                if (dstar.STARTED)
+                {
+                    if (dstar_timer > 600)
+                    {
+                        Sense();
+                        Square move = dstar.Think(actual_cost_array);
+                        if (move != null)
+                        {
+                            object_robot.SetPosition(move.j, move.i);
+                        }
+
+                        dstar_timer = 0;
                     }
                 }
 
@@ -216,8 +236,32 @@ namespace WastedSea
                 {
                     o.Think(gameTime.ElapsedGameTime);
                 }
+            }
+        }
 
+        public void Sense()
+        {
+            actual_cost_array = new int[24, 32];
 
+            for (int y = 0; y < 24; y++)
+            {
+                for (int x = 0; x < 32; x++)
+                {
+                    actual_cost_array[y, x] = 0;
+
+                    foreach (Object o in dynamic_objects)
+                    {
+                        if (o.type == ObjectType.DEBRIS)
+                        {
+                            if (o.pixels_x / 25 == x && o.pixels_y / 25 == y)
+                            {
+                                //Debris is in the way.
+                                actual_cost_array[y, x] = 99;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -261,6 +305,11 @@ namespace WastedSea
             // If the game is transitioning on or off, fade it out to black.
             if (TransitionPosition > 0)
                 ScreenManager.FadeBackBufferToBlack(255 - TransitionAlpha);
+
+            if (dstar.STARTED)
+            {
+                DrawCostGrid();
+            }
         }
 
 
@@ -273,6 +322,19 @@ namespace WastedSea
             Vector2 FontOrigin = new Vector2(0, 0);
             spriteBatch.DrawString(Font1, output, FontPos, Color.Black, 0, FontOrigin, 1.0f, SpriteEffects.None, 0.5f);
             spriteBatch.End();
+        }
+
+        public void DrawCostGrid(){
+            for (int y = 0; y < 24; y++)
+            {
+                for (int x = 0; x < 32; x++)
+                {
+                    int draw_x = dstar.node_array[y, x].j;
+                    int draw_y = dstar.node_array[y, x].i;
+
+                    DrawString(Convert.ToString(dstar.node_array[y, x].Gcost), draw_x * 25, draw_y * 25);
+                }
+            }
         }
 
 

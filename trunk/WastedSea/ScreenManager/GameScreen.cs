@@ -141,9 +141,10 @@ namespace WastedSea
         {
             get
             {
-                return !otherScreenHasFocus &&
-                       (screenState == ScreenState.TransitionOn ||
-                        screenState == ScreenState.Active);
+                //return !otherScreenHasFocus &&
+                //       (screenState == ScreenState.TransitionOn ||
+                //        screenState == ScreenState.grid_to_pixels);
+                return true;
             }
         }
 

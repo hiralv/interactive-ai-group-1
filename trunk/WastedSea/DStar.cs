@@ -35,17 +35,15 @@ namespace WastedSea
     {
         Square goal;
         Square start;
-        Square[,] node_array;
-        int[,] actual_cost_array;
+        public Square[,] node_array;
+        public int[,] actual_cost_array;
         public bool STARTED;
         int k_min;
         Square current;
 
         List<Square> node_list;
-        public DStar(int[,] actual_cost_array)
+        public DStar()
         {
-            this.actual_cost_array = actual_cost_array;
-
             goal = new Square();
             start = new Square();
 
@@ -102,38 +100,90 @@ namespace WastedSea
             Square move = null;
 
             //Begin the dynamic portion of D*.   Procede until you reach goal.
-            if(!Equal(current, goal))
+            if (!Equal(current, goal))
             {
-                Square next_state = current.parent;
+                bool found_move = false;
 
-                int estimated_cost = next_state.Gcost;
-                int actual_cost = actual_cost_array[next_state.i, next_state.j];
-
-                if (estimated_cost != actual_cost)
+                //D* will loop till it can make one move.
+                while (!found_move) 
                 {
-                    //Update the cost model to reflect actual cost.
-                    ModifyCost(next_state, current, actual_cost);
+                    Square next_state = current.parent;
 
-                    //Propogate the cost change out.
-                    int kk_min = ProcessState();
-                    int h_cost = current.Hcost;
+                    int estimated_cost = current.Hcost - current.parent.Hcost;
+                    int actual_cost = actual_cost_array[current.parent.i, current.parent.j];
 
-                    while (kk_min < h_cost)
+                    if (estimated_cost != actual_cost)
                     {
-                        kk_min = ProcessState();
-                        h_cost = current.Hcost;
+                        //Update the cost model to reflect actual cost.
+                        ModifyCost(current.parent, current, actual_cost);
+
+                        //Propogate the cost change out.
+                        int kk_min = -2;
+                        int h_cost = current.Hcost;
+
+                        while (kk_min < h_cost)
+                        {
+                            kk_min = ProcessState();
+                            h_cost = current.Hcost;
+                        }
                     }
-                }
-                else
-                {
-                    //Make the move.
+
                     move = current;
-                    node_list.Add(current);
-                    current = next_state;
+                    node_list.Add(current);         //Make the move.
+                    current = current.parent;
+                    UpdateWithPercepts(current, actual_cost_array);
+                    found_move = true;
                 }
+
+            }
+            else
+            {
+                STARTED = false;
             }
 
             return move;
+        }
+
+        //Updates the cells around Zippy within his percept range based on percept knowledge.
+        public void UpdateWithPercepts(Square s, int[,] actual_cost_array)
+        {
+            int x_start = s.j - 2;
+            if (x_start < 0)
+            {
+                x_start = 0;
+            }
+
+            int x_end = s.j + 3;
+            if (x_end > 32)
+            {
+                x_end = 32;
+            }
+
+            int y_start = s.i - 2;
+            if (y_start < 0)
+            {
+                y_start = 0;
+            }
+            int y_end = s.i + 3;
+            if (y_end > 24)
+            {
+                y_end = 24;
+            }
+
+            for (int y = y_start; y < y_end; y++)
+            {
+                for (int x = x_start; x < x_end; x++)
+                {
+                    if (actual_cost_array[y, x] < 2)
+                    {
+                        node_array[y, x].Gcost = 1;
+                    }
+                    else
+                    {
+                        node_array[y, x].Gcost = 768;
+                    }
+                }
+            }
         }
 
         /** Core function of the D* search algorithm. Propogates g-costs.*/

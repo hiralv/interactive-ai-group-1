@@ -11,6 +11,14 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace WastedSea
 {
+    public enum ObjectType
+    {
+        DEBRIS,
+        OIL,
+        BOAT,
+        BIRD,
+        ROBOT
+    }
     public enum Direction
     {
         UP,
@@ -21,6 +29,7 @@ namespace WastedSea
     //The base class for all game objects that go doubleo the object lists.
     public class Object
     {
+        public ObjectType type;
         public int x_max = 31;
         public int y_max = 22;
         public int grid_to_pixels = 25;
@@ -52,6 +61,14 @@ namespace WastedSea
             pixels_y = y * grid_to_pixels;                  //Starting pixel locations of object.
             time = 0;
             ran = new Random(x * y);
+        }
+
+        public void SetPosition(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+            pixels_x = x * 25;
+            pixels_y = y * 25;
         }
 
         public virtual void Draw()
@@ -109,7 +126,7 @@ namespace WastedSea
         public Robot(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {
-            
+            type = ObjectType.ROBOT;
             launched = false;
             moving_left = true;
             speed = 100;
@@ -179,6 +196,7 @@ namespace WastedSea
         public Boat(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {
+            type = ObjectType.BOAT;
             speed = 2;
         }
 
@@ -194,6 +212,7 @@ namespace WastedSea
         public Bird(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {
+            type = ObjectType.BIRD;
             speed = -3;
             current_dir = Direction.UP;
         }
@@ -243,6 +262,7 @@ namespace WastedSea
         public Debris(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {
+            type = ObjectType.DEBRIS;
             speed = ran.Next(1, 10);
         }
 
@@ -258,6 +278,27 @@ namespace WastedSea
             {
                 pixels_x = x_max * grid_to_pixels;
             }
+        }
+
+        public override void Draw()
+        {
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
+        }
+    }
+
+    //Oil the floating oil.
+    public class Oil : Object
+    {
+        public Oil(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
+            : base(x, y, texture, spriteBatch)
+        {
+            type = ObjectType.OIL;
+        }
+
+        //Causes the debri to float right to left and reset on the right side of the screen.
+        public override void Think(TimeSpan elapsed_game_time)
+        {
+           
         }
 
         public override void Draw()
