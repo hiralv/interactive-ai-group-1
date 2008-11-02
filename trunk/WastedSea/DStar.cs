@@ -123,8 +123,17 @@ namespace WastedSea
 
                         while (kk_min < h_cost)
                         {
-                            kk_min = ProcessState();
-                            h_cost = current.Hcost;
+                            if (kk_min != -1)
+                            {
+                                kk_min = ProcessState();
+                                h_cost = current.Hcost;
+                            }
+                            else
+                            {
+                                //Error,  path cannot be found.
+                                            
+                                break;
+                            }
                         }
                     }
 

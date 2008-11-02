@@ -120,7 +120,7 @@ namespace WastedSea
     //The moveable automated robot.
     public class Robot : Object
     {
-        bool launched;
+        public bool launched;
         bool moving_left;
 
         public Robot(int x, int y, Texture2D texture, SpriteBatch spriteBatch)

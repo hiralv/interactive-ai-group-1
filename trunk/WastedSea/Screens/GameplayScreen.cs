@@ -94,7 +94,7 @@ namespace WastedSea
             Random ran_number = new Random();
 
             //Create all of the debris.
-            int MAX_DEBRIS = 10;
+            int MAX_DEBRIS = 100;
             Debris new_debris;
             for (int i = 0; i < MAX_DEBRIS; i++)
             {
@@ -200,11 +200,7 @@ namespace WastedSea
                 {
                     if (UP_PRESSED)
                     {
-                        if (dstar.STARTED)
-                        {
-
-                        }
-                        else
+                        if (!dstar.STARTED && object_robot.launched)
                         {
                             object_robot.Retun();
                             //Run D* and bring robot home.
@@ -216,7 +212,7 @@ namespace WastedSea
 
                 if (dstar.STARTED)
                 {
-                    if (dstar_timer > 600)
+                    if (dstar_timer > 200)
                     {
                         Sense();
                         Square move = dstar.Think(actual_cost_array);
