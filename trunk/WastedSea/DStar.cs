@@ -21,8 +21,6 @@ namespace WastedSea
     //    Used to represent values for each square.
     public class Square
     {
-
-
         public int i = 0;         // x location
         public int j = 0;         // y location
         public Square parent = null;      // Parent with lowest cost
@@ -39,10 +37,15 @@ namespace WastedSea
         Square start;
         Square[,] node_array;
         int[,] actual_cost_array;
+        public bool STARTED;
+        int k_min;
+        Square current;
 
         List<Square> node_list;
-        public DStar()
+        public DStar(int[,] actual_cost_array)
         {
+            this.actual_cost_array = actual_cost_array;
+
             goal = new Square();
             start = new Square();
 
@@ -60,47 +63,46 @@ namespace WastedSea
                     node_array[y, x].tag = Tag.NEW;
                     node_array[y, x].Gcost = 1;
                     node_array[y, x].Hcost = 0;
-
-                   /* if (PerceptualModel.mapArray[y, x] != 0)
-                    {
-                        actual_cost_array[y, x] = 999999;
-                    }
-                    else
-                    {
-                        actual_cost_array[y, x] = 1;
-                    }*/
                 }
             }
+
+            STARTED = false;
         }
 
         public void DrawDStarPath()
         {
             foreach (Square s in node_list)
             {
-               // int offset = 7;
-                //i_font.Draw(s.j * 25 + offset, s.i * 25 + offset, "[X]");
+
             }
         }
 
-        public void Think()
+        //Does the initial D* setup.
+        public void Start(int start_x, int start_y, int end_x, int end_y)
         {
             //Begin setup.
-            goal = node_array[2, 1];
-            start = node_array[0, 0];
-
+            goal = node_array[end_y, end_x];
+            start = node_array[start_y, start_x];
             Insert(goal, 0);
-
-            int k_min = 0;
+            k_min = 0;
 
             while (start.tag != Tag.CLOSED && k_min != -1)
             {
                 k_min = ProcessState();
             }
 
-            Square current = start;
+            current = start;
+            STARTED = true;
+        }
+
+        public Square Think(int[,] actual_cost_array)
+        {
+            //Updates with percepts.
+            this.actual_cost_array = actual_cost_array;
+            Square move = null;
 
             //Begin the dynamic portion of D*.   Procede until you reach goal.
-            while (!Equal(current, goal))
+            if(!Equal(current, goal))
             {
                 Square next_state = current.parent;
 
@@ -124,11 +126,14 @@ namespace WastedSea
                 }
                 else
                 {
+                    //Make the move.
+                    move = current;
                     node_list.Add(current);
                     current = next_state;
-                    next_state = next_state.parent;
                 }
             }
+
+            return move;
         }
 
         /** Core function of the D* search algorithm. Propogates g-costs.*/
@@ -208,7 +213,6 @@ namespace WastedSea
         int ModifyCost(Square X, Square Y, int cval)
         {
             Y.Gcost = cval;
-            //Y.Gcost = cval;
 
             if (X.tag == Tag.CLOSED)
             {
@@ -296,8 +300,8 @@ namespace WastedSea
         int c(Square X, Square Y)
         {
             return node_array[Y.i, Y.j].Gcost;
-            //return 1;
         }
+
         /** Compares to squares by (x,y) location. */
         bool Equal(Square one, Square two)
         {

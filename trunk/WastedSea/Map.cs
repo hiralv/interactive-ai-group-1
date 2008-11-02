@@ -40,8 +40,8 @@ namespace WastedSea
     public class Map : Microsoft.Xna.Framework.GameComponent
     {
         
-        MapSpace[,] map_array;
-        int[,] map_type_array;
+        public MapSpace[,] map_array;
+        public int[,] map_type_array;
 
         public Texture2D sea, oil, sky, sea_floor, sea_top;
 

@@ -36,6 +36,7 @@ namespace WastedSea
         SpriteFont Font1;
         Vector2 FontPos;
         Map main_map;
+        DStar dstar;
         Boat object_boat;
         Robot object_robot;
         Game1 cur = new Game1();
@@ -46,6 +47,7 @@ namespace WastedSea
 
         //Variables to keep track of key releases.
         bool SPACE_PRESSED = false;
+        bool UP_PRESSED = false;
 
         #endregion
 
@@ -120,6 +122,7 @@ namespace WastedSea
             object_robot = new Robot(35, 35, robot, spriteBatch);
             dynamic_objects.Add(object_robot);
 
+            dstar = new DStar(main_map.map_type_array);
 
             // A real game would probably have more content than this sample, so
             // it would take longer to load. We simulate that by delaying for a
@@ -183,6 +186,30 @@ namespace WastedSea
                         SPACE_PRESSED = false;
                     }
                 }
+
+                if (ks.IsKeyDown(Keys.Up))            //Space bar.
+                {
+                    UP_PRESSED = true;
+                }
+                else
+                {
+                    if (UP_PRESSED)
+                    {
+                        if (dstar.STARTED)
+                        {
+                            Square move = dstar.Think(main_map.map_type_array);
+                        }
+                        else
+                        {
+                            object_robot.Retun();
+                            //Run D* and bring robot home.
+                            dstar.Start(object_robot.x, object_robot.y, object_boat.x, object_boat.y);
+                        }
+                        UP_PRESSED = false;
+                    }
+                }
+
+
 
                 //Allow our dynamic game objects their think cycle.
                 foreach (Object o in dynamic_objects)

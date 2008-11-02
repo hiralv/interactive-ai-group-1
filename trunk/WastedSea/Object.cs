@@ -124,6 +124,11 @@ namespace WastedSea
             launched = true;
         }
 
+        public void Retun()
+        {
+            launched = false;
+        }
+
         
         public override void Think(TimeSpan elapsed_game_time)
         {
