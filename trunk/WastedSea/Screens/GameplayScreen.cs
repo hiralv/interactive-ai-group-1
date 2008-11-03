@@ -40,9 +40,13 @@ namespace WastedSea
         DStar dstar;
         Boat object_boat;
         Robot object_robot;
+        Button object_buttonl, object_buttonr, object_buttonu, object_buttond;
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
-        public Texture2D boat, debris, oil, robot, bird;
+        List<Object> button_objects;
+        public Texture2D boat, debris, oil, robot, bird,
+            lbutton, rbutton, ubutton, dbutton,
+            lbutton_clicked, rbutton_clicked, ubutton_clicked, dbutton_clicked;
         int[,] actual_cost_array;                           //Stores the sensed data to send to the D*.
 
         Random random = new Random();
@@ -66,6 +70,7 @@ namespace WastedSea
 
             main_map = new Map(cur);
             dynamic_objects = new List<Object>();
+            button_objects = new List<Object>();
             dstar_timer = 0;
         }
 
@@ -89,6 +94,20 @@ namespace WastedSea
             object_boat = new Boat(10, 4, boat, spriteBatch);
             dynamic_objects.Add(object_boat);
 
+            lbutton = content.Load<Texture2D>(@"Left");
+            rbutton = content.Load<Texture2D>(@"Right");
+            ubutton = content.Load<Texture2D>(@"Up");
+            dbutton = content.Load<Texture2D>(@"Down");
+            lbutton_clicked = content.Load<Texture2D>(@"Left_Clicked");
+            object_buttonl = new Button(10, 23, lbutton, spriteBatch);
+            object_buttonr = new Button(12, 23, rbutton, spriteBatch);
+            object_buttonu = new Button(14, 23, ubutton, spriteBatch);
+            object_buttond = new Button(16, 23, dbutton, spriteBatch);
+
+            button_objects.Add(object_buttond);
+            button_objects.Add(object_buttonl);
+            button_objects.Add(object_buttonr);
+            button_objects.Add(object_buttonu);
            
 
             Random ran_number = new Random();
@@ -164,6 +183,19 @@ namespace WastedSea
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
             dstar_timer += gameTime.ElapsedGameTime.Milliseconds;
+
+            //Mouse work that doesn't
+            //if (Mouse.GetState().LeftButton == ButtonState.Pressed &&
+            //   Mouse.GetState().X < 265 && Mouse.GetState().X > 250)
+            //{
+            //    object_buttonl.texture = content.Load<Texture2D>(@"Left_Clicked");
+            //}
+            //else
+            //{
+            //    object_buttonl.texture = content.Load<Texture2D>(@"Left");
+            //}
+
+
 
             if (IsActive)
             {
@@ -297,7 +329,18 @@ namespace WastedSea
                 spriteBatch.End();
             }
 
-            DrawString("Score: 0", 0, 0);
+            foreach (Object o in button_objects)
+            {
+                spriteBatch.Begin();
+                o.Draw();
+                spriteBatch.End();
+            }
+
+            //DrawString("Score: 0", 0, 0);
+            DrawString(Mouse.GetState().ToString(), 0, 0);
+            DrawString(object_buttonl.x.ToString(), 0, 20);
+            DrawString(object_buttonl.y.ToString(), 0, 30);
+
             // If the game is transitioning on or off, fade it out to black.
             if (TransitionPosition > 0)
                 ScreenManager.FadeBackBufferToBlack(255 - TransitionAlpha);
