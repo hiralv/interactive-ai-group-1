@@ -9,7 +9,6 @@
 
 #region Using Statements
 using System;
-using System.Text;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -23,6 +22,11 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace WastedSea
 {
+    enum GAMESTATE
+    {
+        SUBSYSTEM,
+        OTHER
+    }
     /// <summary>
     /// This screen implements the actual game logic. It is just a
     /// placeholder to get the idea across: you'll probably want to
@@ -32,6 +36,8 @@ namespace WastedSea
     {
         #region Fields
 
+        int [] sub_params;
+        GAMESTATE game_state;
         int dstar_timer;
         ContentManager content;
         SpriteBatch spriteBatch;
@@ -41,24 +47,22 @@ namespace WastedSea
         DStar dstar;
         Boat object_boat;
         Robot object_robot;
-        Button object_buttonl,object_buttonr,object_buttonu,object_buttond;
+        Button object_buttonl, object_buttonr, object_buttonu, object_buttond;
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
         List<Object> button_objects;
-        public Texture2D boat, debris, oil, robot, bird, 
-            lbutton, rbutton, ubutton, dbutton,
+        public Texture2D boat, debris, oil, robot, bird,
+            lbutton, rbutton, ubutton, dbutton, sub_system, sub_selector,
             lbutton_clicked, rbutton_clicked, ubutton_clicked, dbutton_clicked;
+        Point sub_selector_loc;
         int[,] actual_cost_array;                           //Stores the sensed data to send to the D*.
 
         Random random = new Random();
 
         //Variables to keep track of key releases.
         bool SPACE_PRESSED = false;
-
-        bool MOUSE_CLICKED = false;
-
         bool UP_PRESSED = false;
-
+        bool DOWN_PRESSED = false;
 
         #endregion
 
@@ -75,11 +79,10 @@ namespace WastedSea
 
             main_map = new Map(cur);
             dynamic_objects = new List<Object>();
-
             button_objects = new List<Object>();
-
             dstar_timer = 0;
-
+            sub_params = new int[4];
+            game_state = GAMESTATE.OTHER;
         }
 
 
@@ -88,11 +91,12 @@ namespace WastedSea
         /// </summary>
         public override void LoadContent()
         {
+            
             if (content == null)
                 content = new ContentManager(ScreenManager.Game.Services, "Content");
 
             Font1 = content.Load<SpriteFont>("SpriteFont1");
-            FontPos = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2);
+            FontPos = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width/2, ScreenManager.GraphicsDevice.Viewport.Height/2);
             spriteBatch = ScreenManager.SpriteBatch;
             main_map.Initialize(ScreenManager.GraphicsDevice, content);
             boat = content.Load<Texture2D>(@"Boat");
@@ -101,6 +105,10 @@ namespace WastedSea
             oil = content.Load<Texture2D>(@"Oil");
             object_boat = new Boat(10, 4, boat, spriteBatch);
             dynamic_objects.Add(object_boat);
+
+            sub_selector_loc = new Point(0, 0);
+            sub_selector = content.Load<Texture2D>(@"selector");
+            sub_system = content.Load<Texture2D>(@"agent_subsumption");
             lbutton = content.Load<Texture2D>(@"Left");
             rbutton = content.Load<Texture2D>(@"Right");
             ubutton = content.Load<Texture2D>(@"Up");
@@ -115,6 +123,7 @@ namespace WastedSea
             button_objects.Add(object_buttonl);
             button_objects.Add(object_buttonr);
             button_objects.Add(object_buttonu);
+           
 
             Random ran_number = new Random();
 
@@ -151,16 +160,9 @@ namespace WastedSea
             dynamic_objects.Add(object_robot);
 
             dstar = new DStar();
-
-            // A real game would probably have more content than this sample, so
-            // it would take longer to load. We simulate that by delaying for a
-            // while, giving you a chance to admire the beautiful loading screen.
             Thread.Sleep(1000);
-
-            // once the load has finished, we use ResetElapsedTime to tell the game's
-            // timing mechanism that we have just finished a very long frame, and that
-            // it should not try to catch up.
             ScreenManager.Game.ResetElapsedTime();
+            
         }
 
 
@@ -171,6 +173,7 @@ namespace WastedSea
         {
             content.Unload();
         }
+
 
         #endregion
 
@@ -187,94 +190,131 @@ namespace WastedSea
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed &&
-                Mouse.GetState().X < 265 && Mouse.GetState().X > 250)
-            {
-                object_buttonl.texture = content.Load<Texture2D>(@"Left_Clicked");
-            }
-            else
-            {
-                object_buttonl.texture = content.Load<Texture2D>(@"Left");
-            }
-
-
             dstar_timer += gameTime.ElapsedGameTime.Milliseconds;
+
+            //Mouse work that doesn't
+            //if (Mouse.GetState().LeftButton == ButtonState.Pressed &&
+            //   Mouse.GetState().X < 265 && Mouse.GetState().X > 250)
+            //{
+            //    object_buttonl.texture = content.Load<Texture2D>(@"Left_Clicked");
+            //}
+            //else
+            //{
+            //    object_buttonl.texture = content.Load<Texture2D>(@"Left");
+            //}
+
+
 
             if (IsActive)
             {
                 KeyboardState ks = Keyboard.GetState();
 
-                if (ks.IsKeyDown(Keys.Right))       //Right arrow.
+                switch (game_state)
                 {
-                    object_boat.MoveRight(gameTime.ElapsedGameTime);
-                }
-
-                if (ks.IsKeyDown(Keys.Left))            //Left arrow.
-                {
-                    object_boat.MoveLeft(gameTime.ElapsedGameTime);
-                }
-
-                if (ks.IsKeyDown(Keys.Space))            //Space bar.
-                {
-                    SPACE_PRESSED = true;
-                }
-                else
-                {
-                    if (SPACE_PRESSED)
-                    {
-                        object_robot.Launch(object_boat.pixels_x / 25, object_boat.pixels_y / 25);
-                        SPACE_PRESSED = false;
-                    }
-                }
-
-                if (ks.IsKeyDown(Keys.Up))            //Space bar.
-                {
-                    UP_PRESSED = true;
-                }
-                else
-                {
-                    if (UP_PRESSED)
-                    {
-                        if (!dstar.STARTED && object_robot.launched)
+                    case GAMESTATE.OTHER:
                         {
-                            object_robot.Retun();
-                            //Run D* and bring robot home.
-                            dstar.Start(object_robot.pixels_x / 25, object_robot.pixels_y / 25, object_boat.pixels_x / 25, object_boat.pixels_y / 25);
-                        }
-                        UP_PRESSED = false;
-                    }
-                }
+                            if (ks.IsKeyDown(Keys.Right))       //Right arrow.
+                            {
+                                object_boat.MoveRight(gameTime.ElapsedGameTime);
+                            }
 
-                if (dstar.STARTED)
-                {
-                    if (dstar_timer > 200)
-                    {
-                        Sense();
-                        Square move = dstar.Think(actual_cost_array);
-                        if (move != null)
+                            if (ks.IsKeyDown(Keys.Left))            //Left arrow.
+                            {
+                                object_boat.MoveLeft(gameTime.ElapsedGameTime);
+                            }
+
+                            if (ks.IsKeyDown(Keys.Space))            //Space bar.
+                            {
+                                SPACE_PRESSED = true;
+                            }
+                            else
+                            {
+                                if (SPACE_PRESSED)
+                                {
+                                    if (game_state == GAMESTATE.SUBSYSTEM)
+                                    {
+                                        game_state = GAMESTATE.OTHER;
+                                    }
+                                    else
+                                    {
+                                        game_state = GAMESTATE.SUBSYSTEM;
+                                    }
+                                    SPACE_PRESSED = false;
+                                }
+                            }
+
+                            if (ks.IsKeyDown(Keys.Up))            //Space bar.
+                            {
+                                UP_PRESSED = true;
+                            }
+                            else
+                            {
+                                if (UP_PRESSED)
+                                {
+                                    if (!dstar.STARTED && object_robot.launched)
+                                    {
+                                        object_robot.Retun();
+                                        //Run D* and bring robot home.
+                                        dstar.Start(object_robot.pixels_x / 25, object_robot.pixels_y / 25, object_boat.pixels_x / 25, object_boat.pixels_y / 25);
+                                    }
+                                    UP_PRESSED = false;
+                                }
+                            }
+
+                            if (ks.IsKeyDown(Keys.Down))            //Space bar.
+                            {
+                                DOWN_PRESSED = true;
+                            }
+                            else
+                            {
+                                if (DOWN_PRESSED)
+                                {
+                                    object_robot.Launch(object_boat.pixels_x / 25, object_boat.pixels_y / 25);
+                                    DOWN_PRESSED = false;
+                                }
+                            }
+
+                            if (dstar.STARTED)
+                            {
+                                if (dstar_timer > 200)
+                                {
+                                    Sense();
+                                    Square move = dstar.Think(actual_cost_array);
+                                    if (move != null)
+                                    {
+                                        object_robot.SetPosition(move.j, move.i);
+                                    }
+
+                                    dstar_timer = 0;
+                                }
+                            }
+
+
+
+                            //Allow our dynamic game objects their think cycle.
+                            foreach (Object o in dynamic_objects)
+                            {
+                                o.Think(gameTime.ElapsedGameTime);
+                            }
+
+                            break;
+                        }
+
+                    case GAMESTATE.SUBSYSTEM:
                         {
-                            object_robot.SetPosition(move.j, move.i);
+
+                            break;
                         }
 
-                        dstar_timer = 0;
-                    }
+                   
                 }
 
-
-
-                //Allow our dynamic game objects their think cycle.
-                foreach (Object o in dynamic_objects)
-                {
-                    o.Think(gameTime.ElapsedGameTime);
-                }
             }
         }
 
         public void Sense()
         {
             actual_cost_array = new int[24, 32];
-
 
             for (int y = 0; y < 24; y++)
             {
@@ -326,7 +366,7 @@ namespace WastedSea
         {
             // Our player and enemy are both actually just text strings.                       
             main_map.Draw(spriteBatch);
-            
+
             foreach (Object o in dynamic_objects)
             {
                 spriteBatch.Begin();
@@ -336,17 +376,16 @@ namespace WastedSea
 
             foreach (Object o in button_objects)
             {
-               spriteBatch.Begin();
-               o.Draw();
-               spriteBatch.End();
+                spriteBatch.Begin();
+                o.Draw();
+                spriteBatch.End();
             }
 
-            //DrawString("Score: 0", 0, 0);
-            DrawString(Mouse.GetState().ToString(), 0, 0);
-            DrawString(object_buttonl.x.ToString(),0, 20);
-            DrawString(object_buttonl.y.ToString(), 0, 30);
+            DrawString("Score: 0", 0, 0);
+            //DrawString(Mouse.GetState().ToString(), 0, 0);
+            //DrawString(object_buttonl.x.ToString(), 0, 20);
+            //DrawString(object_buttonl.y.ToString(), 0, 30);
 
-   
             // If the game is transitioning on or off, fade it out to black.
             if (TransitionPosition > 0)
                 ScreenManager.FadeBackBufferToBlack(255 - TransitionAlpha);
@@ -354,6 +393,16 @@ namespace WastedSea
             if (dstar.STARTED)
             {
                 DrawCostGrid();
+            }
+
+            if (game_state == GAMESTATE.SUBSYSTEM)
+            {
+                
+                spriteBatch.Begin();
+                spriteBatch.Draw(sub_system, new Rectangle((6 * 25) + 0, (6 * 25) + 0, sub_system.Width, sub_system.Height), Color.White);
+                spriteBatch.Draw(sub_selector, new Rectangle((8 * 25) + 0, (8 * 25) + 0, sub_selector.Width, sub_selector.Height), Color.White);
+                
+                spriteBatch.End();
             }
         }
 

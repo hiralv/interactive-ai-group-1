@@ -306,4 +306,19 @@ namespace WastedSea
             spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
         }
     }
+
+    public class Button : Object
+    {
+        public Button(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
+            : base(x, y, texture, spriteBatch)
+        {
+
+        }
+
+        public override void Draw()
+        {
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
+        }
+    }
+
 }
