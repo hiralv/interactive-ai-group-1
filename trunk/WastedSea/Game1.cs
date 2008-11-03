@@ -50,8 +50,6 @@ namespace WastedSea
 
             screenManager.AddScreen(new BackgroundScreen());
             screenManager.AddScreen(new MainMenuScreen());
-            // main_map = new Map(this);
-            //dynamic_objects = new List<Object>();
         }
 
         /// <summary>

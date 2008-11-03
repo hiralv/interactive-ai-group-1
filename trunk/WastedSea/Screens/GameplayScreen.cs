@@ -47,22 +47,28 @@ namespace WastedSea
         DStar dstar;
         Boat object_boat;
         Robot object_robot;
-        Button object_buttonl, object_buttonr, object_buttonu, object_buttond;
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
         List<Object> button_objects;
-        public Texture2D boat, debris, oil, robot, bird,
-            lbutton, rbutton, ubutton, dbutton, sub_system, sub_selector,
-            lbutton_clicked, rbutton_clicked, ubutton_clicked, dbutton_clicked;
+        public Texture2D boat, debris, oil, robot, bird,sub_system, sub_selector;
         Point sub_selector_loc;
         int[,] actual_cost_array;                           //Stores the sensed data to send to the D*.
-
+        int redX = (11 * 25) + 9;
+        int redY = (8 * 25) - 7;
+        int which = 2;
+        int energyValue = 0;
+        int minValue = 0;
+        int maxValue = 0;
+        int oilRangeValue = 0;
+       
         Random random = new Random();
 
         //Variables to keep track of key releases.
         bool SPACE_PRESSED = false;
         bool UP_PRESSED = false;
         bool DOWN_PRESSED = false;
+        bool LEFT_PRESSED = false;
+        bool RIGHT_PRESSED = false;
 
         #endregion
 
@@ -109,22 +115,7 @@ namespace WastedSea
             sub_selector_loc = new Point(0, 0);
             sub_selector = content.Load<Texture2D>(@"selector");
             sub_system = content.Load<Texture2D>(@"agent_subsumption");
-            lbutton = content.Load<Texture2D>(@"Left");
-            rbutton = content.Load<Texture2D>(@"Right");
-            ubutton = content.Load<Texture2D>(@"Up");
-            dbutton = content.Load<Texture2D>(@"Down");
-            lbutton_clicked = content.Load<Texture2D>(@"Left_Clicked");
-            object_buttonl = new Button(10, 23, lbutton, spriteBatch);
-            object_buttonr = new Button(12, 23, rbutton, spriteBatch);
-            object_buttonu = new Button(14, 23, ubutton, spriteBatch);
-            object_buttond = new Button(16, 23, dbutton, spriteBatch);
-
-            button_objects.Add(object_buttond);
-            button_objects.Add(object_buttonl);
-            button_objects.Add(object_buttonr);
-            button_objects.Add(object_buttonu);
-           
-
+            
             Random ran_number = new Random();
 
             //Create all of the debris.
@@ -191,19 +182,6 @@ namespace WastedSea
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
             dstar_timer += gameTime.ElapsedGameTime.Milliseconds;
-
-            //Mouse work that doesn't
-            //if (Mouse.GetState().LeftButton == ButtonState.Pressed &&
-            //   Mouse.GetState().X < 265 && Mouse.GetState().X > 250)
-            //{
-            //    object_buttonl.texture = content.Load<Texture2D>(@"Left_Clicked");
-            //}
-            //else
-            //{
-            //    object_buttonl.texture = content.Load<Texture2D>(@"Left");
-            //}
-
-
 
             if (IsActive)
             {
@@ -302,6 +280,156 @@ namespace WastedSea
 
                     case GAMESTATE.SUBSYSTEM:
                         {
+                            if (ks.IsKeyDown(Keys.Down))
+                            {
+                                DOWN_PRESSED = true;
+                            }
+                            else
+                            {
+                                //Move Selector to pick levels
+                                if (DOWN_PRESSED)
+                                {
+                                    if (which == 2)
+                                    {
+                                        redY += 45;
+                                        redX += 1;                                        
+                                        which++;
+                                    }
+                                    else if (which == 3)
+                                    {
+                                        redY += 40;
+                                        which++;
+                                    }
+                                    else if (which == 4)
+                                    {
+                                        redY += 38;
+                                        which = 1;
+                                    }
+                                    else
+                                    {
+                                        redY = (8 * 25) - 7;
+                                        redX -=1;
+                                        which++;
+                                    }
+                                    DOWN_PRESSED = false;
+                                }
+                            }
+
+                            //Adjust values
+                            if (ks.IsKeyDown(Keys.Left))
+                            {
+                                LEFT_PRESSED = true;
+                            }
+                            else
+                            {
+                                if (LEFT_PRESSED)
+                                {
+                                    if (which == 2) //EnergyValue
+                                    {
+                                        if (energyValue > 0)
+                                        {
+                                            energyValue--;
+                                        }
+                                    }
+                                    else if (which == 3) //Min Depth
+                                    {
+                                        if (minValue > 0)
+                                        {
+                                            minValue--;
+                                        }
+                                    }
+                                    else if (which == 4) //Max Depth
+                                    {
+                                        if (maxValue > 0)
+                                        {
+                                            maxValue--;
+                                        }
+                                    }
+                                    else //Oil Range
+                                    {
+                                        if (oilRangeValue > 0)
+                                        {
+                                            oilRangeValue--;
+                                        }
+                                    }
+
+                                    LEFT_PRESSED = false;
+                                }
+                            }
+
+                            if (ks.IsKeyDown(Keys.Right))
+                            {
+                                RIGHT_PRESSED = true;
+                            }
+                            else
+                            {
+                                if (RIGHT_PRESSED)
+                                {
+                                    if (which == 2) //Energy Value
+                                    {
+                                        if (energyValue < 10)
+                                        {
+                                            energyValue++;
+                                        }
+                                    }
+                                    else if (which == 3) //Min Value
+                                    {
+                                        if (minValue < 10)
+                                        {
+                                            minValue++;
+                                        }
+                                    }
+                                    else if (which == 4) //Max Value
+                                    {
+                                        if (maxValue < 10)
+                                        {
+                                            maxValue++;
+                                        }
+                                    }
+                                    else //Oil Range
+                                    {
+                                        if (oilRangeValue < 10)
+                                        {
+                                            oilRangeValue++;
+                                        }
+                                    }
+                                }
+                                RIGHT_PRESSED = false;
+                            }
+
+                            if(ks.IsKeyDown(Keys.Space))
+                            {
+                                SPACE_PRESSED = true;
+                            }else
+                            {
+                                if (SPACE_PRESSED)
+                                {
+                                    game_state = GAMESTATE.OTHER;
+                                    SPACE_PRESSED = false;
+                                }
+                            }
+
+                            //Subsumption Architecture hurr...
+                            if (energyValue < 4)
+                            {
+                                //RETURNTOBOAT!
+                            }
+                            else if (minValue > 3)//This would be changed to the oil value presumably
+                            {
+                                //DIVE
+                            }
+                            else if (maxValue < 100)//This would be changed to the oil value presumably
+                            {
+                                //RISE
+                            }
+                            else if (oilRangeValue < 3)//Tells how close agent is to oil
+                            {
+                                //CLEANOIL
+                            }
+                            else
+                            {
+                                //WALK_RANDOMLY
+                            }
 
                             break;
                         }
@@ -382,6 +510,7 @@ namespace WastedSea
             }
 
             DrawString("Score: 0", 0, 0);
+            DrawString(redX.ToString(), 12, 12);
             //DrawString(Mouse.GetState().ToString(), 0, 0);
             //DrawString(object_buttonl.x.ToString(), 0, 20);
             //DrawString(object_buttonl.y.ToString(), 0, 30);
@@ -400,9 +529,13 @@ namespace WastedSea
                 
                 spriteBatch.Begin();
                 spriteBatch.Draw(sub_system, new Rectangle((6 * 25) + 0, (6 * 25) + 0, sub_system.Width, sub_system.Height), Color.White);
-                spriteBatch.Draw(sub_selector, new Rectangle((8 * 25) + 0, (8 * 25) + 0, sub_selector.Width, sub_selector.Height), Color.White);
-                
+                spriteBatch.Draw(sub_selector, new Rectangle(redX, redY, sub_selector.Width, sub_selector.Height), Color.White);
                 spriteBatch.End();
+
+                DrawString(energyValue.ToString(), 289,195);
+                DrawString(minValue.ToString(), 289, 240);
+                DrawString(maxValue.ToString(), 289, 280);
+                DrawString(oilRangeValue.ToString(), 289, 318);
             }
         }
 
