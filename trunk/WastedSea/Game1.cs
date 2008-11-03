@@ -46,6 +46,7 @@ namespace WastedSea
 
             screenManager = new ScreenManager(this);
             Components.Add(screenManager);
+            this.IsMouseVisible = true;
 
             screenManager.AddScreen(new BackgroundScreen());
             screenManager.AddScreen(new MainMenuScreen());

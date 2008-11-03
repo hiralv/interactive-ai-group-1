@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
+  <Asset Type="Pipeline:BuildItemCollection">
+    <Item>
+      <Source>Boat.PNG</Source>
+      <Name>Boat</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Boat.xnb</Output>
+      <Time>2008-11-02T15:53:04.078125-05:00</Time>
+    </Item>
+    <Item>
+      <Source>SeaTop.PNG</Source>
+      <Name>SeaTop</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\SeaTop.xnb</Output>
+      <Time>2008-11-02T15:53:04.09375-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Debris.PNG</Source>
+      <Name>Debris</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Debris.xnb</Output>
+      <Time>2008-11-02T15:53:04.046875-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Oil.PNG</Source>
+      <Name>Oil</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Oil.xnb</Output>
+      <Time>2008-11-02T15:53:04.078125-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Robot.PNG</Source>
+      <Name>Robot</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Robot.xnb</Output>
+      <Time>2008-11-02T15:53:04.078125-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Sea.PNG</Source>
+      <Name>Sea</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Sea.xnb</Output>
+      <Time>2008-11-02T15:53:04.046875-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Sky.PNG</Source>
+      <Name>Sky</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Sky.xnb</Output>
+      <Time>2008-11-02T15:53:04.03125-05:00</Time>
+    </Item>
+    <Item>
+      <Source>SeaFloor.PNG</Source>
+      <Name>SeaFloor</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\SeaFloor.xnb</Output>
+      <Time>2008-11-02T15:53:04.0625-05:00</Time>
+    </Item>
+    <Item>
+      <Source>background.png</Source>
+      <Name>background</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\background.xnb</Output>
+      <Time>2008-11-02T15:53:04.0625-05:00</Time>
+    </Item>
+    <Item>
+      <Source>blank.png</Source>
+      <Name>blank</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\blank.xnb</Output>
+      <Time>2008-11-02T15:53:04.09375-05:00</Time>
+    </Item>
+    <Item>
+      <Source>gradient.png</Source>
+      <Name>gradient</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\gradient.xnb</Output>
+      <Time>2008-11-02T15:53:04.03125-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Bird.PNG</Source>
+      <Name>Bird</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Bird.xnb</Output>
+      <Time>2008-11-02T15:53:04.0625-05:00</Time>
+    </Item>
+    <Item>
+      <Source>SpriteFont1.spritefont</Source>
+      <Name>SpriteFont1</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\SpriteFont1.xnb</Output>
+      <Time>2008-11-02T15:53:04.09375-05:00</Time>
+    </Item>
+    <Item>
+      <Source>gamefont.spritefont</Source>
+      <Name>gamefont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\gamefont.xnb</Output>
+      <Time>2008-11-02T15:53:04.046875-05:00</Time>
+    </Item>
+    <Item>
+      <Source>menufont.spritefont</Source>
+      <Name>menufont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\menufont.xnb</Output>
+      <Time>2008-11-02T15:53:04.03125-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Left.PNG</Source>
+      <Name>Left</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Left.xnb</Output>
+      <Time>2008-11-02T20:57:03.703125-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Mousey.PNG</Source>
+      <Name>Mousey</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Mousey.xnb</Output>
+      <Time>2008-11-02T17:26:54.75-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Left_Clicked.PNG</Source>
+      <Name>Left_Clicked</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Left_Clicked.xnb</Output>
+      <Time>2008-11-02T20:58:01.578125-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Down.PNG</Source>
+      <Name>Down</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Down.xnb</Output>
+      <Time>2008-11-02T21:23:07.453125-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Down_Clicked.PNG</Source>
+      <Name>Down_Clicked</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Down_Clicked.xnb</Output>
+      <Time>2008-11-02T21:23:20.390625-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Right.PNG</Source>
+      <Name>Right</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Right.xnb</Output>
+      <Time>2008-11-02T20:57:18.65625-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Right_Clicked.PNG</Source>
+      <Name>Right_Clicked</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Right_Clicked.xnb</Output>
+      <Time>2008-11-02T20:58:18.015625-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Up.PNG</Source>
+      <Name>Up</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Up.xnb</Output>
+      <Time>2008-11-02T21:22:42.1875-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Up_Clicked.PNG</Source>
+      <Name>Up_Clicked</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\Up_Clicked.xnb</Output>
+      <Time>2008-11-02T21:22:18.859375-05:00</Time>
+    </Item>
+    <BuildSuccessful>true</BuildSuccessful>
+    <Settings>
+      <TargetPlatform>Windows</TargetPlatform>
+      <BuildConfiguration>Debug</BuildConfiguration>
+      <RootDirectory>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\Content\</RootDirectory>
+      <LoggerRootDirectory>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\Content\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Documents and Settings\AJ\interactive-ai-group-1\WastedSea\bin\x86\Debug\Content\</OutputDirectory>
+    </Settings>
+    <Assemblies>
+      <Assembly>
+        <Key>c:\Program Files\Microsoft XNA\XNA Game Studio\v2.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.XImporter.dll</Key>
+        <Value>2007-11-28T12:08:00-05:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>c:\Program Files\Microsoft XNA\XNA Game Studio\v2.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.TextureImporter.dll</Key>
+        <Value>2007-11-28T12:08:42-05:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>c:\Program Files\Microsoft XNA\XNA Game Studio\v2.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.FBXImporter.dll</Key>
+        <Value>2007-11-28T12:08:30-05:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>c:\Program Files\Microsoft XNA\XNA Game Studio\v2.0\References\Windows\x86\Microsoft.Xna.Framework.Content.Pipeline.EffectImporter.dll</Key>
+        <Value>2007-11-28T12:07:44-05:00</Value>
+      </Assembly>
+      <Assembly>
+        <Key>C:\WINDOWS\assembly\GAC_32\Microsoft.Xna.Framework.Content.Pipeline\2.0.0.0__6d5c3888ef60e27d\Microsoft.Xna.Framework.Content.Pipeline.dll</Key>
+        <Value>2008-10-26T21:51:50.5625-04:00</Value>
+      </Assembly>
+    </Assemblies>
+  </Asset>
+</XnaContent>
