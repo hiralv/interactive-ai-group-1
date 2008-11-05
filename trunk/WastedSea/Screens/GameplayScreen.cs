@@ -107,7 +107,7 @@ namespace WastedSea
             main_map.Initialize(ScreenManager.GraphicsDevice, content);
             boat = content.Load<Texture2D>(@"Boat");
             object_boat = new Boat(10, 4, boat, spriteBatch);
-            debris = content.Load<Texture2D>(@"Debris");
+            debris = content.Load<Texture2D>(@"vDebris");
             oil = content.Load<Texture2D>(@"Oil");
             object_boat = new Boat(10, 4, boat, spriteBatch);
             dynamic_objects.Add(object_boat);
@@ -129,7 +129,7 @@ namespace WastedSea
                 dynamic_objects.Add(new_debris);
             }
 
-            bird = content.Load<Texture2D>(@"Bird");
+            bird = content.Load<Texture2D>(@"vBird");
             dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(0, 2), bird, spriteBatch));
             dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(0, 2), bird, spriteBatch));
             dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(0, 2), bird, spriteBatch));
@@ -146,7 +146,7 @@ namespace WastedSea
             }
 
             //Create robot.
-            robot = content.Load<Texture2D>(@"Robot");
+            robot = content.Load<Texture2D>(@"vRobot");
             object_robot = new Robot(35, 35, robot, spriteBatch);
             dynamic_objects.Add(object_robot);
 
