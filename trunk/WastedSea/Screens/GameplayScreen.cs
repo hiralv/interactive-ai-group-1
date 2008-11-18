@@ -47,10 +47,11 @@ namespace WastedSea
         DStar dstar;
         Boat object_boat;
         Robot object_robot;
+        Powermeter object_powermeter;
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
         List<Object> button_objects;
-        public Texture2D boat, debris, oil, robot, bird,sub_system, sub_selector;
+        public Texture2D boat, debris, oil, robot, bird,sub_system, sub_selector,powermeter,power;
         Point sub_selector_loc;
         int[,] actual_cost_array;                           //Stores the sensed data to send to the D*.
         int redX = (11 * 25) + 9;
@@ -149,6 +150,12 @@ namespace WastedSea
             robot = content.Load<Texture2D>(@"vRobot");
             object_robot = new Robot(35, 35, robot, spriteBatch);
             dynamic_objects.Add(object_robot);
+
+            //Add powermeter
+            powermeter = content.Load<Texture2D>(@"powermeter");
+            power = content.Load<Texture2D>(@"power");
+            object_powermeter = new Powermeter(3, 0, powermeter, spriteBatch, power, energyValue);
+            dynamic_objects.Add(object_powermeter);
 
             dstar = new DStar();
             Thread.Sleep(1000);
@@ -329,6 +336,7 @@ namespace WastedSea
                                         if (energyValue > 0)
                                         {
                                             energyValue--;
+                                            object_powermeter.energy = energyValue;
                                         }
                                     }
                                     else if (which == 3) //Min Depth
@@ -367,9 +375,10 @@ namespace WastedSea
                                 {
                                     if (which == 2) //Energy Value
                                     {
-                                        if (energyValue < 10)
+                                        if (energyValue < 18)
                                         {
                                             energyValue++;
+                                            object_powermeter.energy = energyValue;
                                         }
                                     }
                                     else if (which == 3) //Min Value

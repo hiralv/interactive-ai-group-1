@@ -17,7 +17,8 @@ namespace WastedSea
         OIL,
         BOAT,
         BIRD,
-        ROBOT
+        ROBOT,
+        POWERMETER
     }
     public enum Direction
     {
@@ -321,4 +322,32 @@ namespace WastedSea
         }
     }
 
+    public class Powermeter : Object
+    {
+        public int energy;
+        public Texture2D power;
+        
+        public Powermeter(int x, int y, Texture2D texture, SpriteBatch spriteBatch, Texture2D power, int energy)
+            : base(x, y, texture, spriteBatch)
+        {
+            this.energy = energy;
+            type = ObjectType.POWERMETER;
+            this.power = power;
+        }
+
+        public override void Think(TimeSpan elapsed_game_time)
+        {
+
+        }
+
+        public override void Draw()
+        {
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
+
+            for (int i = 0; i < energy; i++)
+            {
+                spriteBatch.Draw(power, new Rectangle(pixels_x + (i*power.Width+1), pixels_y + 4, power.Width, power.Height), Color.White);
+            }
+        }
+    }
 }
