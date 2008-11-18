@@ -107,7 +107,7 @@ namespace WastedSea
             main_map.Initialize(ScreenManager.GraphicsDevice, content);
             boat = content.Load<Texture2D>(@"Boat");
             object_boat = new Boat(10, 4, boat, spriteBatch);
-            debris = content.Load<Texture2D>(@"vDebris");
+            debris = content.Load<Texture2D>(@"Debris");
             oil = content.Load<Texture2D>(@"Oil");
             object_boat = new Boat(10, 4, boat, spriteBatch);
             dynamic_objects.Add(object_boat);
