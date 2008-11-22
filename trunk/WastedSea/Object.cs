@@ -20,6 +20,7 @@ namespace WastedSea
         ROBOT,
         POWERMETER
     }
+
     public enum Direction
     {
         UP,
@@ -27,6 +28,7 @@ namespace WastedSea
         LEFT,
         RIGHT
     }
+
     //The base class for all game objects that go doubleo the object lists.
     public class Object
     {
@@ -123,6 +125,8 @@ namespace WastedSea
     {
         public bool launched;
         bool moving_left;
+        public int timeSinceLaunched;
+        public Powermeter power;
 
         public Robot(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
@@ -140,6 +144,7 @@ namespace WastedSea
             pixels_x = x * grid_to_pixels;
             pixels_y = y * grid_to_pixels;
             launched = true;
+            timeSinceLaunched = 0;
         }
 
         public void Retun()
@@ -152,6 +157,7 @@ namespace WastedSea
         {
             if (launched)
             {
+                SenseOil(elapsed_game_time);
                 MoveDown(elapsed_game_time);
                 time = 0;
             
@@ -182,6 +188,20 @@ namespace WastedSea
                         }
                     }
                 }   
+            }
+        }
+
+        private void SenseOil(TimeSpan elapsed_game_time)
+        {
+            int MAX_SENSE_RANGE = 5;
+            int xdiff, ydiff;
+            foreach (Oil oil in Oil.oil_list)
+            {
+                xdiff = Math.Abs(x - oil.x);
+                ydiff = Math.Abs(y - oil.y);
+
+                if (xdiff < MAX_SENSE_RANGE && ydiff < MAX_SENSE_RANGE)
+                    power.energy = power.energy - Math.Max(xdiff, ydiff);
             }
         }
 
@@ -290,6 +310,8 @@ namespace WastedSea
     //Oil the floating oil.
     public class Oil : Object
     {
+        static public List<Oil> oil_list = new List<Oil>();
+
         public Oil(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {

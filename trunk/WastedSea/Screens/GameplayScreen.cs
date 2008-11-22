@@ -47,7 +47,7 @@ namespace WastedSea
         DStar dstar;
         Boat object_boat;
         Robot object_robot;
-        Powermeter object_powermeter;
+        //Powermeter object_powermeter;
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
         List<Object> button_objects;
@@ -144,6 +144,7 @@ namespace WastedSea
                 int ran_y = ran_number.Next(8, 22);
                 new_oil = new Oil(ran_x, ran_y, oil, spriteBatch);
                 dynamic_objects.Add(new_oil);
+                Oil.oil_list.Add((Oil)new_oil);
             }
 
             //Create robot.
@@ -154,8 +155,8 @@ namespace WastedSea
             //Add powermeter
             powermeter = content.Load<Texture2D>(@"powermeter");
             power = content.Load<Texture2D>(@"power");
-            object_powermeter = new Powermeter(3, 0, powermeter, spriteBatch, power, energyValue);
-            dynamic_objects.Add(object_powermeter);
+            object_robot.power = new Powermeter(3, 0, powermeter, spriteBatch, power, energyValue);
+            dynamic_objects.Add(object_robot.power);
 
             dstar = new DStar();
             Thread.Sleep(1000);
@@ -186,6 +187,14 @@ namespace WastedSea
         public override void Update(GameTime gameTime, bool otherScreenHasFocus,
                                                        bool coveredByOtherScreen)
         {
+            if (object_robot.launched)
+                object_robot.timeSinceLaunched++;
+
+            if (object_robot.timeSinceLaunched % 120 == 0 && object_robot.launched)
+                energyValue--;
+
+            object_robot.power.energy = energyValue;
+
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
             dstar_timer += gameTime.ElapsedGameTime.Milliseconds;
@@ -336,7 +345,6 @@ namespace WastedSea
                                         if (energyValue > 0)
                                         {
                                             energyValue--;
-                                            object_powermeter.energy = energyValue;
                                         }
                                     }
                                     else if (which == 3) //Min Depth
@@ -375,10 +383,9 @@ namespace WastedSea
                                 {
                                     if (which == 2) //Energy Value
                                     {
-                                        if (energyValue < 18)
+                                        if (energyValue < 10)
                                         {
                                             energyValue++;
-                                            object_powermeter.energy = energyValue;
                                         }
                                     }
                                     else if (which == 3) //Min Value
@@ -405,7 +412,8 @@ namespace WastedSea
                                 }
                                 RIGHT_PRESSED = false;
                             }
-
+                            
+                            
                             if(ks.IsKeyDown(Keys.Space))
                             {
                                 SPACE_PRESSED = true;
@@ -523,7 +531,7 @@ namespace WastedSea
             //DrawString(Mouse.GetState().ToString(), 0, 0);
             //DrawString(object_buttonl.x.ToString(), 0, 20);
             //DrawString(object_buttonl.y.ToString(), 0, 30);
-
+            
             // If the game is transitioning on or off, fade it out to black.
             if (TransitionPosition > 0)
                 ScreenManager.FadeBackBufferToBlack(255 - TransitionAlpha);
