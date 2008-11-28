@@ -90,7 +90,10 @@ namespace WastedSea
             {
                 pixels_y = y_max * grid_to_pixels;
             }
+
+            y = (int)Math.Floor((double)(pixels_y / 25));
         }
+
         public void MoveLeft(TimeSpan elapsed_game_time)
         {
             time += (elapsed_game_time.Milliseconds + speed);
@@ -102,6 +105,7 @@ namespace WastedSea
             {
                 pixels_x = 0;
             }
+            x = (int)Math.Floor((double)(pixels_x / 25));
         }
 
         public void MoveRight(TimeSpan elapsed_game_time)
@@ -115,6 +119,8 @@ namespace WastedSea
             {
                 pixels_x = x_max * grid_to_pixels;
             }
+
+            x = (int)Math.Floor((double)(pixels_x / 25));
         }
 
         public virtual void Think(TimeSpan elapsed_game_time) { }
@@ -127,6 +133,10 @@ namespace WastedSea
         bool moving_left;
         public int timeSinceLaunched;
         public Powermeter power;
+        public int minPower;
+        public int maxPower;
+        public int maxOilRange;
+        public static List<Oil> sensedOil;
 
         public Robot(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
@@ -135,6 +145,7 @@ namespace WastedSea
             launched = false;
             moving_left = true;
             speed = 100;
+            sensedOil = new List<Oil>();
         }
 
         public void Launch(int x, int y)
@@ -155,12 +166,13 @@ namespace WastedSea
         
         public override void Think(TimeSpan elapsed_game_time)
         {
+            #region Move Left Right
             if (launched)
             {
                 SenseOil(elapsed_game_time);
                 MoveDown(elapsed_game_time);
                 time = 0;
-            
+
                 if (pixels_y == y_max * grid_to_pixels)
                 {
                     if (moving_left)
@@ -187,21 +199,51 @@ namespace WastedSea
                             MoveRight(elapsed_game_time);
                         }
                     }
-                }   
+                }
+            }
+            #endregion
+
+            if (power.energy < 4)
+            {
+                //RETURNTOBOAT!
+            }
+            else if (minPower > 3)//This would be changed to the oil value presumably
+            {
+                //object_robot.MoveDown(gameTime.ElapsedGameTime);
+            }
+            else if (maxPower < 100)//This would be changed to the oil value presumably
+            {
+                //RISE
+            }
+            else if (maxOilRange < 3)//Tells how close agent is to oil
+            {
+                //CLEANOIL
+            }
+            else
+            {
+                //WALK_RANDOMLY
             }
         }
 
         private void SenseOil(TimeSpan elapsed_game_time)
         {
-            int MAX_SENSE_RANGE = 5;
+       
             int xdiff, ydiff;
             foreach (Oil oil in Oil.oil_list)
             {
                 xdiff = Math.Abs(x - oil.x);
                 ydiff = Math.Abs(y - oil.y);
 
-                if (xdiff < MAX_SENSE_RANGE && ydiff < MAX_SENSE_RANGE)
+                if (xdiff <= maxOilRange && ydiff <= maxOilRange)
+                {
                     power.energy = power.energy - Math.Max(xdiff, ydiff);
+                    Robot.sensedOil.Add(oil);
+                }
+            }
+
+            foreach (Oil oil in Robot.sensedOil)
+            {
+                Oil.oil_list.Remove(oil);
             }
         }
 
@@ -321,7 +363,7 @@ namespace WastedSea
         //Causes the debri to float right to left and reset on the right side of the screen.
         public override void Think(TimeSpan elapsed_game_time)
         {
-           
+            
         }
 
         public override void Draw()
