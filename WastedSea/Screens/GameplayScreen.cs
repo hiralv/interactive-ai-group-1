@@ -194,6 +194,16 @@ namespace WastedSea
                 energyValue--;
 
             object_robot.power.energy = energyValue;
+            object_robot.minPower = minValue;
+            object_robot.maxPower = maxValue;
+            object_robot.maxOilRange = oilRangeValue;
+
+            foreach (Oil oil in Robot.sensedOil)
+            {
+                dynamic_objects.Remove(oil);
+            }
+
+            Robot.sensedOil.Clear();
 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
@@ -433,7 +443,7 @@ namespace WastedSea
                             }
                             else if (minValue > 3)//This would be changed to the oil value presumably
                             {
-                                //DIVE
+                                object_robot.MoveDown(gameTime.ElapsedGameTime);
                             }
                             else if (maxValue < 100)//This would be changed to the oil value presumably
                             {
@@ -450,11 +460,9 @@ namespace WastedSea
 
                             break;
                         }
-
-                   
                 }
-
             }
+
         }
 
         public void Sense()
