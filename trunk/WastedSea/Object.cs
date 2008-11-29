@@ -82,6 +82,21 @@ namespace WastedSea
             spriteBatch.Draw(texture, new Rectangle(x * grid_to_pixels, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
         }
 
+        public void MoveUp(TimeSpan elapsed_game_time)
+        {
+            time += (elapsed_game_time.Milliseconds + speed);
+
+            pixels_y -= time / grid_to_pixels;
+            time = time % grid_to_pixels;
+
+            if (pixels_y > y_max * grid_to_pixels)
+            {
+                pixels_y = y_max * grid_to_pixels;
+            }
+
+            y = (int)Math.Floor((double)(pixels_y / 25));
+        }
+
         public void MoveDown(TimeSpan elapsed_game_time)
         {
             time += (elapsed_game_time.Milliseconds + speed);
@@ -142,9 +157,11 @@ namespace WastedSea
         public int maxDepth;
         public int maxOilRange;
         public int depth;
-        public static List<Oil> sensedOil;
+        public static List<Oil> sensedOil = new List<Oil>();
+        public static List<Oil> removeOil = new List<Oil>();
         DStar dstar;
         int[,] actual_cost_array;
+        int[,] areaKnowledge;
         public int boatx, boaty;
         int dstar_timer;
         #endregion
@@ -156,8 +173,15 @@ namespace WastedSea
             launched = false;
             moving_left = true;
             speed = 100;
-            sensedOil = new List<Oil>();
             dstar = new DStar();
+            areaKnowledge = new int[24, 32];
+
+            for (int i = 0; i < 24; i++)
+            {
+                for (int j = 0; j < 32; j++)
+                    areaKnowledge[i, j] = 0;
+            }
+
         }
 
         public void Launch(int x, int y)
@@ -222,8 +246,8 @@ namespace WastedSea
                 if (power.energy < 4)
                 {
                     Retun();
-                    dstar.Start(pixels_x / 25, pixels_y / 25, boatx / 25, boaty / 25);
-                    dstar_timer = 0;
+                    dstar.Start(pixels_x / 25, pixels_y / 25, (int)Math.Floor((double)boatx / 25), (int)Math.Floor((double)boaty / 25));
+                    
                     //RETURNTOBOAT!
                 }
                 else if (depth < minDepth)//This would be changed to the oil value presumably
@@ -232,7 +256,7 @@ namespace WastedSea
                 }
                 //else if (maxDepth < 100)//This would be changed to the oil value presumably
                 //{
-                //    //RISE
+                //    MoveUp(elapsed_game_time);
                 //}
                 //else if (maxOilRange < 3)//Tells how close agent is to oil
                 //{
@@ -241,40 +265,74 @@ namespace WastedSea
                 else
                 {
                     SenseOil();
-        
-                    if (moving_left)
+
+                    int direction = GetDirection(x, y, maxOilRange);
+
+                    switch (direction)
                     {
-                        if (pixels_x == 0)
-                        {
-                            moving_left = false;
-                            MoveRight(elapsed_game_time);
-                        }
-                        else
-                        {
+                        case 0:
                             MoveLeft(elapsed_game_time);
-                         }
+                            break;
+
+                        case 1:
+                            MoveRight(elapsed_game_time);
+                            break;
+
+                        case 2:
+                            MoveUp(elapsed_game_time);
+                            break;
+
+                        case 3:
+                            MoveDown(elapsed_game_time);
+                            break;
+
                     }
-                    else
+
+                    areaKnowledge[y, x] -= 5;
+                    foreach (Oil oil in Robot.sensedOil)
                     {
-                        if (pixels_x == x_max * grid_to_pixels)
+                        if (x == oil.x && y == oil.y)
                         {
-                            moving_left = true;
-                            MoveLeft(elapsed_game_time);
-                        }
-                        else
-                        {
-                            MoveRight(elapsed_game_time);
+                            Robot.removeOil.Add(oil);
+                            areaKnowledge[y, x] = -2;
                         }
                     }
+                    #region Move Left Right
+                    //if (moving_left)
+                    //{
+                    //    if (pixels_x == 0)
+                    //    {
+                    //        moving_left = false;
+                    //        MoveRight(elapsed_game_time);
+                    //    }
+                    //    else
+                    //    {
+                    //        MoveLeft(elapsed_game_time);
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    if (pixels_x == x_max * grid_to_pixels)
+                    //    {
+                    //        moving_left = true;
+                    //        MoveLeft(elapsed_game_time);
+                    //    }
+                    //    else
+                    //    {
+                    //        MoveRight(elapsed_game_time);
+                    //    }
+                    //} 
+                    #endregion
                }
             }
-            dstar_timer++;
+
+            #region Find Path
             if (dstar.STARTED)
             {
-                SenseDerbis();
-
-                if (dstar_timer > 10)
+                dstar_timer += (int)elapsed_game_time.Milliseconds;
+                if (dstar_timer > 100)
                 {
+                    SenseDerbis();
                     Square move = dstar.Think(actual_cost_array);
                     if (move != null)
                     {
@@ -282,7 +340,8 @@ namespace WastedSea
                     }
                     dstar_timer = 0;
                 }
-            }
+            } 
+            #endregion
         }
 
         private void SenseOil()
@@ -296,15 +355,20 @@ namespace WastedSea
 
                 if (xdiff <= maxOilRange && ydiff <= maxOilRange)
                 {
-                    power.energy = power.energy - Math.Max(xdiff, ydiff);
-                    Robot.sensedOil.Add(oil);
+                    //if (oil.x > minDepth && oil.x < maxDepth)
+                    if(oil.x > minDepth)
+                    {
+                        power.energy = power.energy - Math.Max(xdiff, ydiff);
+                        Robot.sensedOil.Add(oil);
+                        areaKnowledge[oil.y, oil.x] = 5;
+                    }
                 }
             }
 
-            foreach (Oil oil in Robot.sensedOil)
-            {
-                Oil.oil_list.Remove(oil);
-            }
+            //foreach (Oil oil in Robot.sensedOil)
+            //{
+            //    Oil.oil_list.Remove(oil);
+            //}
         }
 
         private void SenseDerbis()
@@ -333,6 +397,73 @@ namespace WastedSea
         public override void Draw()
         {
             spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
+        }
+
+        private int GetDirection(int x, int y, int range)
+        {
+            int currx = x;
+            int curry = y;
+            int[] direction = new int[4] {0, 0, 0, 0 };
+            int max,ret;
+
+            for (int i = 0; i < range; i++)
+            {
+                if (currx > 0)
+                {
+                    direction[0] += areaKnowledge[y, currx];
+                    currx--;
+                }
+
+                if (x == 0)
+                {
+                    direction[0] = -999999;
+                    areaKnowledge[y, x] = -999999;
+                }
+
+            }
+
+            currx = x;
+            for (int i = 0; i < range; i++)
+            {
+                if (currx < 31)
+                {
+                    direction[1] += areaKnowledge[y, currx];
+                    currx++;
+                }
+
+            }
+
+            for (int i = 0; i < range; i++)
+            {
+                if (curry > 8)
+                {
+                    direction[2] += areaKnowledge[curry, x];
+                    curry--;
+                }
+            }
+
+            curry = y;
+            for (int i = 0; i < range; i++)
+            {
+                if (curry < 22)
+                {
+                    direction[3] += areaKnowledge[curry, x];
+                    curry++;
+                }
+            }
+            ret = ran.Next(0, 3);
+            max = direction[ret];
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (direction[i] > max)
+                {
+                    max = direction[i];
+                    ret = i;
+                }
+            }
+
+                return ret;
         }
     }
 
