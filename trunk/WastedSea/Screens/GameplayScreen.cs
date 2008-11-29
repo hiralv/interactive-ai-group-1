@@ -128,6 +128,7 @@ namespace WastedSea
                 int ran_y = ran_number.Next(5, 7);
                 new_debris = new Debris(ran_x, ran_y, debris, spriteBatch);
                 dynamic_objects.Add(new_debris);
+                Debris.derbislist.Add(new_debris);
             }
 
             bird = content.Load<Texture2D>(@"vBird");
@@ -194,9 +195,11 @@ namespace WastedSea
                 energyValue--;
 
             object_robot.power.energy = energyValue;
-            object_robot.minPower = minValue;
-            object_robot.maxPower = maxValue;
+            object_robot.minDepth = minValue;
+            object_robot.maxDepth = maxValue;
             object_robot.maxOilRange = oilRangeValue;
+            object_robot.boatx = object_boat.pixels_x;
+            object_robot.boaty = object_boat.pixels_y;
 
             foreach (Oil oil in Robot.sensedOil)
             {

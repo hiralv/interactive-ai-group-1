@@ -32,6 +32,7 @@ namespace WastedSea
     //The base class for all game objects that go doubleo the object lists.
     public class Object
     {
+        #region Variables
         public ObjectType type;
         public int x_max = 31;
         public int y_max = 22;
@@ -52,14 +53,16 @@ namespace WastedSea
         public int speed;
         public SpriteBatch spriteBatch;
 
-        public Direction current_dir;
+        public Direction current_dir; 
+        #endregion
 
+        #region Methods
         public Object(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
         {
             this.texture = texture;
             this.x = x;
             this.y = y;
-            this.spriteBatch = spriteBatch;     
+            this.spriteBatch = spriteBatch;
             pixels_x = x * grid_to_pixels;                  //Starting pixel locations of object.
             pixels_y = y * grid_to_pixels;                  //Starting pixel locations of object.
             time = 0;
@@ -123,20 +126,28 @@ namespace WastedSea
             x = (int)Math.Floor((double)(pixels_x / 25));
         }
 
-        public virtual void Think(TimeSpan elapsed_game_time) { }
+        public virtual void Think(TimeSpan elapsed_game_time) { } 
+        #endregion
     }
 
     //The moveable automated robot.
     public class Robot : Object
     {
+        #region Variables
         public bool launched;
         bool moving_left;
         public int timeSinceLaunched;
         public Powermeter power;
-        public int minPower;
-        public int maxPower;
+        public int minDepth;
+        public int maxDepth;
         public int maxOilRange;
+        public int depth;
         public static List<Oil> sensedOil;
+        DStar dstar;
+        int[,] actual_cost_array;
+        public int boatx, boaty;
+        int dstar_timer;
+        #endregion
 
         public Robot(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
@@ -146,6 +157,7 @@ namespace WastedSea
             moving_left = true;
             speed = 100;
             sensedOil = new List<Oil>();
+            dstar = new DStar();
         }
 
         public void Launch(int x, int y)
@@ -167,14 +179,69 @@ namespace WastedSea
         public override void Think(TimeSpan elapsed_game_time)
         {
             #region Move Left Right
+            //if (launched)
+            //{
+            //    SenseOil(elapsed_game_time);
+            //    MoveDown(elapsed_game_time);
+            //    time = 0;
+
+            //    if (pixels_y == y_max * grid_to_pixels)
+            //    {
+            //        if (moving_left)
+            //        {
+            //            if (pixels_x == 0)
+            //            {
+            //                moving_left = false;
+            //                MoveRight(elapsed_game_time);
+            //            }
+            //            else
+            //            {
+            //                MoveLeft(elapsed_game_time);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            if (pixels_x == x_max * grid_to_pixels)
+            //            {
+            //                moving_left = true;
+            //                MoveLeft(elapsed_game_time);
+            //            }
+            //            else
+            //            {
+            //                MoveRight(elapsed_game_time);
+            //            }
+            //        }
+            //    }
+            //}
+            #endregion
+
+            depth = y - 5;
+
             if (launched)
             {
-                SenseOil(elapsed_game_time);
-                MoveDown(elapsed_game_time);
-                time = 0;
-
-                if (pixels_y == y_max * grid_to_pixels)
+                if (power.energy < 4)
                 {
+                    Retun();
+                    dstar.Start(pixels_x / 25, pixels_y / 25, boatx / 25, boaty / 25);
+                    dstar_timer = 0;
+                    //RETURNTOBOAT!
+                }
+                else if (depth < minDepth)//This would be changed to the oil value presumably
+                {
+                    MoveDown(elapsed_game_time);
+                }
+                //else if (maxDepth < 100)//This would be changed to the oil value presumably
+                //{
+                //    //RISE
+                //}
+                //else if (maxOilRange < 3)//Tells how close agent is to oil
+                //{
+                //    //CLEANOIL
+                //}
+                else
+                {
+                    SenseOil();
+        
                     if (moving_left)
                     {
                         if (pixels_x == 0)
@@ -185,7 +252,7 @@ namespace WastedSea
                         else
                         {
                             MoveLeft(elapsed_game_time);
-                        }
+                         }
                     }
                     else
                     {
@@ -199,33 +266,26 @@ namespace WastedSea
                             MoveRight(elapsed_game_time);
                         }
                     }
-                }
+               }
             }
-            #endregion
+            dstar_timer++;
+            if (dstar.STARTED)
+            {
+                SenseDerbis();
 
-            if (power.energy < 4)
-            {
-                //RETURNTOBOAT!
-            }
-            else if (minPower > 3)//This would be changed to the oil value presumably
-            {
-                //object_robot.MoveDown(gameTime.ElapsedGameTime);
-            }
-            else if (maxPower < 100)//This would be changed to the oil value presumably
-            {
-                //RISE
-            }
-            else if (maxOilRange < 3)//Tells how close agent is to oil
-            {
-                //CLEANOIL
-            }
-            else
-            {
-                //WALK_RANDOMLY
+                if (dstar_timer > 10)
+                {
+                    Square move = dstar.Think(actual_cost_array);
+                    if (move != null)
+                    {
+                        SetPosition(move.j, move.i);
+                    }
+                    dstar_timer = 0;
+                }
             }
         }
 
-        private void SenseOil(TimeSpan elapsed_game_time)
+        private void SenseOil()
         {
        
             int xdiff, ydiff;
@@ -244,6 +304,29 @@ namespace WastedSea
             foreach (Oil oil in Robot.sensedOil)
             {
                 Oil.oil_list.Remove(oil);
+            }
+        }
+
+        private void SenseDerbis()
+        {
+            actual_cost_array = new int[24, 32];
+
+            for (int y = 0; y < 24; y++)
+            {
+                for (int x = 0; x < 32; x++)
+                {
+                    actual_cost_array[y, x] = 0;
+
+                    foreach (Object o in Debris.derbislist)
+                    {
+                        if (o.pixels_x / 25 == x && o.pixels_y / 25 == y)
+                        {
+                            //Debris is in the way.
+                            actual_cost_array[y, x] = 99;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -322,6 +405,8 @@ namespace WastedSea
     //Floating debris that require our agent to use D* on the way home.
     public class Debris : Object
     {
+        public static List<Debris> derbislist = new List<Debris>();
+
         public Debris(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch)
         {
