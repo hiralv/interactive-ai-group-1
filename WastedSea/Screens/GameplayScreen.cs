@@ -201,12 +201,13 @@ namespace WastedSea
             object_robot.boatx = object_boat.pixels_x;
             object_robot.boaty = object_boat.pixels_y;
 
-            foreach (Oil oil in Robot.sensedOil)
+            foreach (Oil oil in Robot.removeOil)
             {
                 dynamic_objects.Remove(oil);
             }
 
             Robot.sensedOil.Clear();
+            Robot.removeOil.Clear();
 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
