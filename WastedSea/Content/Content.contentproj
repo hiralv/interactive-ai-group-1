@@ -211,13 +211,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="vDebris.png">
-      <Name>vDebris</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="power.png">
       <Name>power</Name>
       <Importer>TextureImporter</Importer>
