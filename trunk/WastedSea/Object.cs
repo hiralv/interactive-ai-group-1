@@ -183,6 +183,7 @@ namespace WastedSea
         DStar dstar;
         int[,] actual_cost_array;
         public int[,] areaKnowledge;
+        public int[,] step;
         public int boatx, boaty;
         int dstar_timer;                                    //Stores time since last D* update request.
         int dstar_interval;                                 //How often to request a move from D* (interpolate inbetween).
@@ -215,7 +216,7 @@ namespace WastedSea
             maxDepth = y_max - 4;
             areaKnowledge = new int[24, 32];
             prev_direc = -1;
-            
+            step = new int[24, 32];
 
             for (int i = 0; i < 24; i++)
             {
@@ -226,7 +227,7 @@ namespace WastedSea
             for (int i = minDepth + 5; i < maxDepth + 5; i++)
             {
                 for (int j = 0; j < 32; j++)
-                    areaKnowledge[i, j] = 0;
+                    areaKnowledge[i, j] = 1;
             }
         }
 
@@ -299,47 +300,47 @@ namespace WastedSea
                 //{
                 //    MoveUp(elapsed_game_time);
                 //}
-                else if (Robot.sensedOil.Count > 0)//Tells how close agent is to oil
-                {
+                //else if (Robot.sensedOil.Count > 0)//Tells how close agent is to oil
+                //{
 
-                    Oil oil = Robot.sensedOil[0];
-                    //Robot.sensedOil.Remove(oil);
+                //    Oil oil = Robot.sensedOil[0];
+                //    //Robot.sensedOil.Remove(oil);
 
-                    if (oil.x > x)
-                        Move(elapsed_game_time, 1);
-                    else if (oil.x < x)
-                        Move(elapsed_game_time, 0);
-                    else if (oil.y > y)
-                        Move(elapsed_game_time, 3);
-                    else if (oil.y < y)
-                        Move(elapsed_game_time,2);
-
-
-                    if (x == oil.x && oil.y == y)
-                    {
-                        Robot.sensedOil.Remove(oil);
-                        Robot.removeOil.Add(oil);
-                        //areaKnowledge[oil.x, oil.y] -= 500;
-                    }
+                //    if (oil.x > x)
+                //        Move(elapsed_game_time, 1);
+                //    else if (oil.x < x)
+                //        Move(elapsed_game_time, 0);
+                //    else if (oil.y > y)
+                //        Move(elapsed_game_time, 3);
+                //    else if (oil.y < y)
+                //        Move(elapsed_game_time,2);
 
 
-                    //foreach (Oil oil in Robot.sensedOil)
-                    //{
-                    //    if (x == oil.x && y == oil.y)
-                    //    {
-                    //        Robot.removeOil.Add(oil);
-                    //        areaKnowledge[y, x] = -500;
-                    //    }
-                    //}
+                //    if (x == oil.x && oil.y == y)
+                //    {
+                //        Robot.sensedOil.Remove(oil);
+                //        Robot.removeOil.Add(oil);
+                //        //areaKnowledge[oil.x, oil.y] -= 500;
+                //    }
 
-                    //foreach (Oil oil in Robot.removeOil)
-                    //{
-                    //    Robot.sensedOil.Remove(oil);
-                    //}
 
-                    //removeOil.Clear();
-                    //CLEANOIL
-                }
+                //    //foreach (Oil oil in Robot.sensedOil)
+                //    //{
+                //    //    if (x == oil.x && y == oil.y)
+                //    //    {
+                //    //        Robot.removeOil.Add(oil);
+                //    //        areaKnowledge[y, x] = -500;
+                //    //    }
+                //    //}
+
+                //    //foreach (Oil oil in Robot.removeOil)
+                //    //{
+                //    //    Robot.sensedOil.Remove(oil);
+                //    //}
+
+                //    //removeOil.Clear();
+                //    //CLEANOIL
+                //}
                 else
                 {
                     SenseOil();
@@ -350,7 +351,7 @@ namespace WastedSea
 
                     Random ran = new Random();
                     if(prev_direc == direction)
-                        direction = ran.Next(0, 4);
+                        direction = ran.Next(0, 8);
 
                     Move(elapsed_game_time, direction);
                     prev_direc = direction;
@@ -435,7 +436,7 @@ namespace WastedSea
         private int GetRandomDirecion()
         {
             int direction = ran.Next(0, 4);
-            int[] moves = new int[4] { -99999, -99999, -99999, -99999 };
+            int[] moves = new int[8] { -99999, -99999, -99999, -99999, -99999, -99999, -99999, -99999 };
             //int[] moves = new int[4];
             
             #region Old Method
@@ -491,7 +492,8 @@ namespace WastedSea
             //}
             #endregion
 
-            for (int i = 1; i < 3; i++)
+            int i = 1;
+            //for (int i = 1; i < 3; i++)
             {
                 if ((x - i) > 0)
                 {
@@ -499,18 +501,18 @@ namespace WastedSea
                     {
                         moves[0] = 0;
                     }
-                    moves[0] += areaKnowledge[y, x - i];
-                    areaKnowledge[y, x - i]--;
+                    moves[0] += areaKnowledge[y, x - i] * step[y, x -i ];
+                    areaKnowledge[y, x - i] -= 5;
                 }
                 else
                 {
                     moves[0] = -99999;
-                    break;
+                    //break;
                 }
                  
             }
 
-            for (int i = 1; i < 3; i++)
+            //for (int i = 1; i < 3; i++)
             {
                 if ((x + i) < 32)
                 {
@@ -518,35 +520,35 @@ namespace WastedSea
                     {
                         moves[1] = 0;
                     }
-                    moves[1] += areaKnowledge[y, x + i];
-                    areaKnowledge[y, x + i]--;
+                    moves[1] += areaKnowledge[y, x + i] * step[y, x + i];
+                    areaKnowledge[y, x + i] -= 5;
                 }
                 else
                 {
                     moves[1] = -99999;
-                    break;
+                    //break;
                 } 
             }
 
-            for (int i = 1; i < 3; i++)
+            //for (int i = 1; i < 3; i++)
             {
-                if ((y - i) > 5)
+                if ((y - i) > minDepth)
                 {
                     if (moves[2] == -99999)
                     {
                         moves[2] = 0;
                     }
-                    moves[2] += areaKnowledge[y - i, x];
-                    areaKnowledge[y - i, x]--;
+                    moves[2] += areaKnowledge[y - i, x] * step[y - i, x];
+                    areaKnowledge[y - i, x] -= 5;
                 }
                 else
                 {
                     moves[2] = -99999;
-                    break;
+                    //break;
                 }
             }
 
-            for (int i = 1; i < 3; i++)
+            //for (int i = 1; i < 3; i++)
             {
                 if ((y + i) < 24)
                 {
@@ -554,19 +556,68 @@ namespace WastedSea
                     {
                         moves[3] = 0;
                     }
-                    moves[3] += areaKnowledge[y + i, x];
-                    areaKnowledge[y + i, x]--;
+                    moves[3] += areaKnowledge[y + i, x] * step[y + i, x];
+                    areaKnowledge[y + i, x] -=5 ;
                 }
                 else
                 {
                     moves[3] = -99999;
-                    break;
+                    //break;
                 }
             }
 
+
+            if ((x + 1) < 32)
+            {
+                if (y + 1 < 24)
+                {
+                    if (moves[7] == -99999)
+                    {
+                        moves[7] = 0;
+                    }
+                    moves[7] += areaKnowledge[y + 1, x + 1] * step[y + 1, x + 1];
+                    areaKnowledge[y + 1, x] -=5 ;
+                }
+
+                if (y - 1 > minDepth)
+                {
+                    if (moves[6] == -99999)
+                    {
+                        moves[6] = 0;
+                    }
+                    moves[6] += areaKnowledge[y - 1, x + 1] * step[y - 1, x + 1]; ;
+                    areaKnowledge[y - 1, x] -=5;
+                }
+            }
+
+
+            if ((x - 1) > 0)
+            {
+                if (y + 1 < 24)
+                {
+                    if (moves[5] == -99999)
+                    {
+                        moves[5] = 0;
+                    }
+                    moves[5] += areaKnowledge[y + 1, x - 1] * step[y + 1, x - 1]; ;
+                    areaKnowledge[y + 1, x] -= 5;
+                }
+
+                if (y - 1 > minDepth)
+                {
+                    if (moves[4] == -99999)
+                    {
+                        moves[4] = 0;
+                    }
+                    moves[4] += areaKnowledge[y - 1, x - 1] * step[y - 1, x - 1]; ;
+                    areaKnowledge[y - 1, x] -= 5;
+                }
+            }
+
+
             int max = moves[direction];
 
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 8; j++)
             {
                 if (moves[j] > max)
                 {
@@ -584,23 +635,82 @@ namespace WastedSea
             {
                 case 0:
                     MoveLeft(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
                     break;
 
                 case 1:
                     MoveRight(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
                     break;
 
                 case 2:
                     MoveUp(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
                     break;
 
                 case 3:
                     MoveDown(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
+                    break;
+
+                case 4:
+                    MoveLeft(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
+
+                    MoveUp(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
+                    break;
+
+                case 5:
+                    MoveLeft(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
+
+                    MoveDown(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
+                    break;
+
+                case 6:
+                    MoveRight(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
+
+                    MoveDown(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
+                    break;
+
+                case 7:
+                    MoveRight(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
+
+                    MoveUp(elapsed_game_time);
+                    areaKnowledge[y, x] -= 15;
+                    step[y, x] += 1;
+                    power.energy -= 0.0025f;
                     break;
 
             }
-            areaKnowledge[y, x] -= 15;
-            power.energy -= 0.0025f;
+            
         }
 
         private void SenseOil()
@@ -618,7 +728,7 @@ namespace WastedSea
                     if(oil.x > minDepth)
                     {
                         //power.energy = power.energy - Math.Max(xdiff, ydiff);
-                        power.energy -= 0.005f;
+                        //power.energy -= 0.005f;
                         Robot.sensedOil.Add(oil);
                         //areaKnowledge[oil.y, oil.x] = 500;
                     }
