@@ -191,23 +191,27 @@ namespace WastedSea
             if (object_robot.launched)
                 object_robot.timeSinceLaunched++;
 
-            if (object_robot.timeSinceLaunched % 120 == 0 && object_robot.launched)
-                energyValue--;
+            //if (object_robot.timeSinceLaunched % 120 == 0 && object_robot.launched)
+            //    energyValue--;
 
-            object_robot.power.energy = energyValue;
+            //object_robot.power.energy = energyValue;
             object_robot.minDepth = minValue;
             object_robot.maxDepth = maxValue;
             object_robot.maxOilRange = oilRangeValue;
             object_robot.boatx = object_boat.pixels_x;
             object_robot.boaty = object_boat.pixels_y;
 
-            foreach (Oil oil in Robot.removeOil)
+            if (Robot.removeOil.Count > 0)
             {
-                dynamic_objects.Remove(oil);
+                foreach (Oil oil in Robot.removeOil)
+                {
+                    dynamic_objects.Remove(oil);
+                }
+                Robot.removeOil.Clear();
             }
 
-            Robot.sensedOil.Clear();
-            Robot.removeOil.Clear();
+            //Robot.sensedOil.Clear();
+            
 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
@@ -359,6 +363,7 @@ namespace WastedSea
                                         if (energyValue > 0)
                                         {
                                             energyValue--;
+                                            object_robot.power.energy = energyValue;
                                         }
                                     }
                                     else if (which == 3) //Min Depth
@@ -400,6 +405,7 @@ namespace WastedSea
                                         if (energyValue < 10)
                                         {
                                             energyValue++;
+                                            object_robot.power.energy = energyValue;
                                         }
                                     }
                                     else if (which == 3) //Min Value
@@ -550,8 +556,10 @@ namespace WastedSea
 
             if (dstar.STARTED)
             {
-                DrawCostGrid();
+                //DrawCostGrid();
             }
+            if (object_robot.launched)
+                DrawCostGrid();
 
             if (game_state == GAMESTATE.SUBSYSTEM)
             {
@@ -588,7 +596,8 @@ namespace WastedSea
                     int draw_x = dstar.node_array[y, x].j;
                     int draw_y = dstar.node_array[y, x].i;
 
-                    DrawString(Convert.ToString(dstar.node_array[y, x].Gcost), draw_x * 25, draw_y * 25);
+                    //DrawString(Convert.ToString(dstar.node_array[y, x].Gcost), draw_x * 25, draw_y * 25);
+                    DrawString(Convert.ToString(object_robot.areaKnowledge[y,x]), draw_x * 25, draw_y * 25);
                 }
             }
         }

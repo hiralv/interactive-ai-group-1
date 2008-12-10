@@ -161,9 +161,10 @@ namespace WastedSea
         public static List<Oil> removeOil = new List<Oil>();
         DStar dstar;
         int[,] actual_cost_array;
-        int[,] areaKnowledge;
+        public int[,] areaKnowledge;
         public int boatx, boaty;
         int dstar_timer;
+        
         #endregion
 
         public Robot(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
@@ -174,14 +175,6 @@ namespace WastedSea
             moving_left = true;
             speed = 100;
             dstar = new DStar();
-            areaKnowledge = new int[24, 32];
-
-            for (int i = 0; i < 24; i++)
-            {
-                for (int j = 0; j < 32; j++)
-                    areaKnowledge[i, j] = 0;
-            }
-
         }
 
         public void Launch(int x, int y)
@@ -192,6 +185,21 @@ namespace WastedSea
             pixels_y = y * grid_to_pixels;
             launched = true;
             timeSinceLaunched = 0;
+            maxDepth = y_max - 4;
+            areaKnowledge = new int[24, 32];
+            
+
+            for (int i = 0; i < 24; i++)
+            {
+                for (int j = 0; j < 32; j++)
+                    areaKnowledge[i, j] = -99999;
+            }
+
+            for (int i = minDepth + 5; i < maxDepth + 5; i++)
+            {
+                for (int j = 0; j < 32; j++)
+                    areaKnowledge[i, j] = 0;
+            }
         }
 
         public void Retun()
@@ -238,12 +246,14 @@ namespace WastedSea
             //    }
             //}
             #endregion
+            if (timeSinceLaunched % 120 == 0 && launched)
+                power.energy--;
 
-            depth = y - 5;
+            depth = y - 4;
 
             if (launched)
             {
-                if (power.energy < 4)
+                if (power.energy < 3)
                 {
                     Retun();
                     dstar.Start(pixels_x / 25, pixels_y / 25, (int)Math.Floor((double)boatx / 25), (int)Math.Floor((double)boaty / 25));
@@ -258,45 +268,60 @@ namespace WastedSea
                 //{
                 //    MoveUp(elapsed_game_time);
                 //}
-                //else if (maxOilRange < 3)//Tells how close agent is to oil
-                //{
-                //    //CLEANOIL
-                //}
+                else if (Robot.sensedOil.Count > 0)//Tells how close agent is to oil
+                {
+
+                    Oil oil = Robot.sensedOil[0];
+                    //Robot.sensedOil.Remove(oil);
+
+                    if (oil.x > x)
+                        Move(1);
+                    else if (oil.x < x)
+                        Move(0);
+                    else if (oil.y > y)
+                        Move(3);
+                    else if (oil.y < y)
+                        Move(2);
+
+
+                    if (x == oil.x && oil.y == y)
+                    {
+                        Robot.sensedOil.Remove(oil);
+                        Robot.removeOil.Add(oil);
+                        //areaKnowledge[oil.x, oil.y] -= 500;
+                    }
+
+
+                    //foreach (Oil oil in Robot.sensedOil)
+                    //{
+                    //    if (x == oil.x && y == oil.y)
+                    //    {
+                    //        Robot.removeOil.Add(oil);
+                    //        areaKnowledge[y, x] = -500;
+                    //    }
+                    //}
+
+                    //foreach (Oil oil in Robot.removeOil)
+                    //{
+                    //    Robot.sensedOil.Remove(oil);
+                    //}
+
+                    //removeOil.Clear();
+                    //CLEANOIL
+                }
                 else
                 {
                     SenseOil();
 
-                    int direction = GetDirection(x, y, maxOilRange);
+                    //int direction = GetDirection(x, y, maxOilRange);
 
-                    switch (direction)
-                    {
-                        case 0:
-                            MoveLeft(elapsed_game_time);
-                            break;
+                    int direction = GetRandomDirecion();
+                    //Random ran = new Random();
+                    //int direction = ran.Next(0, 4);
+                    Move(elapsed_game_time, direction);
 
-                        case 1:
-                            MoveRight(elapsed_game_time);
-                            break;
+                    
 
-                        case 2:
-                            MoveUp(elapsed_game_time);
-                            break;
-
-                        case 3:
-                            MoveDown(elapsed_game_time);
-                            break;
-
-                    }
-
-                    areaKnowledge[y, x] -= 5;
-                    foreach (Oil oil in Robot.sensedOil)
-                    {
-                        if (x == oil.x && y == oil.y)
-                        {
-                            Robot.removeOil.Add(oil);
-                            areaKnowledge[y, x] = -2;
-                        }
-                    }
                     #region Move Left Right
                     //if (moving_left)
                     //{
@@ -344,6 +369,176 @@ namespace WastedSea
             #endregion
         }
 
+        private int GetRandomDirecion()
+        {
+            int direction = ran.Next(0, 4);
+            int[] moves = new int[4] { -99999, -99999, -99999, -99999 };
+            //int[] moves = new int[4];
+            
+            #region Old Method
+            //currx = x;
+            //for (int i = 0; i < currx; i++)
+            //{
+            //    if (currx > 0)
+            //    {
+            //        moves[0] += areaKnowledge[y, currx--];
+            //    }
+            //}
+
+            //currx = x;
+
+            //for (int i = currx; i > x_max; i--)
+            //{
+            //    if (currx < 31)
+            //    {
+            //        moves[1] += areaKnowledge[y, currx++];
+            //    }
+            //}
+
+            //curry = y;
+
+            //for (int i = 0; i < curry; i++)
+            //{
+            //    if (curry > 5)
+            //    {
+            //        moves[2] += areaKnowledge[curry--, x];
+            //    }
+            //}
+
+            //curry = y;
+
+            //for (int i = curry; i > y_max; i--)
+            //{
+            //    if (curry < 22)
+            //    {
+            //        moves[3] += areaKnowledge[curry++, x];
+            //    }
+            //}
+
+            
+            
+            //int max = moves[direction];
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    if (moves[i] > max)
+            //    {
+            //        max = moves[i];
+            //        direction = i;
+            //    }
+            //}
+            #endregion
+
+            for (int i = 1; i < 3; i++)
+            {
+                if ((x - i) > 0)
+                {
+                    if (moves[0] == -99999)
+                    {
+                        moves[0] = 0;
+                    }
+                    moves[0] += areaKnowledge[y, x - i];
+                    areaKnowledge[y, x - i]--;
+                }
+                else
+                {
+                    moves[0] = -99999;
+                    break;
+                }
+                 
+            }
+
+            for (int i = 1; i < 3; i++)
+            {
+                if ((x + i) < 32)
+                {
+                    if (moves[1] == -99999)
+                    {
+                        moves[1] = 0;
+                    }
+                    moves[1] += areaKnowledge[y, x + i];
+                    areaKnowledge[y, x + i]--;
+                }
+                else
+                {
+                    moves[1] = -99999;
+                    break;
+                } 
+            }
+
+            for (int i = 1; i < 3; i++)
+            {
+                if ((y - i) > 5)
+                {
+                    if (moves[2] == -99999)
+                    {
+                        moves[2] = 0;
+                    }
+                    moves[2] += areaKnowledge[y - i, x];
+                    areaKnowledge[y - i, x]--;
+                }
+                else
+                {
+                    moves[2] = -99999;
+                    break;
+                }
+            }
+
+            for (int i = 1; i < 3; i++)
+            {
+                if ((y + i) < 24)
+                {
+                    if (moves[3] == -99999)
+                    {
+                        moves[3] = 0;
+                    }
+                    moves[3] += areaKnowledge[y + i, x];
+                    areaKnowledge[y + i, x]--;
+                }
+                else
+                {
+                    moves[3] = -99999;
+                    break;
+                }
+            }
+
+            int max = moves[direction];
+
+            for (int j = 0; j < 4; j++)
+            {
+                if (moves[j] > max)
+                {
+                    max = moves[j];
+                    direction = j;
+                }
+            }
+
+            return direction;
+        }
+
+        private void Move(TimeSpan elapsed_game_time, int direction)
+        {
+            switch (direction)
+            {
+                case 0:
+                    MoveLeft(elapsed_game_time);
+                    break;
+
+                case 1:
+                    MoveRight(elapsed_game_time);
+                    break;
+
+                case 2:
+                    MoveUp(elapsed_game_time);
+                    break;
+
+                case 3:
+                    MoveDown(elapsed_game_time);
+                    break;
+
+            }
+            areaKnowledge[y, x] -= 15;
+        }
+
         private void SenseOil()
         {
        
@@ -358,9 +553,10 @@ namespace WastedSea
                     //if (oil.x > minDepth && oil.x < maxDepth)
                     if(oil.x > minDepth)
                     {
-                        power.energy = power.energy - Math.Max(xdiff, ydiff);
+                        //power.energy = power.energy - Math.Max(xdiff, ydiff);
+                        power.energy = power.energy--;
                         Robot.sensedOil.Add(oil);
-                        areaKnowledge[oil.y, oil.x] = 5;
+                        //areaKnowledge[oil.y, oil.x] = 500;
                     }
                 }
             }
@@ -411,15 +607,9 @@ namespace WastedSea
                 if (currx > 0)
                 {
                     direction[0] += areaKnowledge[y, currx];
+                    areaKnowledge[y, currx] -= 1;
                     currx--;
                 }
-
-                if (x == 0)
-                {
-                    direction[0] = -999999;
-                    areaKnowledge[y, x] = -999999;
-                }
-
             }
 
             currx = x;
@@ -428,6 +618,7 @@ namespace WastedSea
                 if (currx < 31)
                 {
                     direction[1] += areaKnowledge[y, currx];
+                    areaKnowledge[y, currx] -= 1;
                     currx++;
                 }
 
@@ -435,9 +626,10 @@ namespace WastedSea
 
             for (int i = 0; i < range; i++)
             {
-                if (curry > 8)
+                if (curry > 5)
                 {
                     direction[2] += areaKnowledge[curry, x];
+                    areaKnowledge[curry, x] -= 1;
                     curry--;
                 }
             }
@@ -448,10 +640,11 @@ namespace WastedSea
                 if (curry < 22)
                 {
                     direction[3] += areaKnowledge[curry, x];
+                    areaKnowledge[curry, x] -= 1;
                     curry++;
                 }
             }
-            ret = ran.Next(0, 3);
+            ret = ran.Next(4);
             max = direction[ret];
 
             for (int i = 0; i < 4; i++)
