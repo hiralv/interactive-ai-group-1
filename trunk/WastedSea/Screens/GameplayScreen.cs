@@ -27,24 +27,23 @@ namespace WastedSea
         SUBSYSTEM,
         OTHER
     }
-    /// <summary>
+
     /// This screen implements the actual game logic. It is just a
     /// placeholder to get the idea across: you'll probably want to
     /// put some more interesting gameplay in here!
-    /// </summary>
     class GameplayScreen : GameScreen
     {
         #region Fields
 
-        int [] sub_params;
-        GAMESTATE game_state;
-        int dstar_timer;
-        ContentManager content;
+        int [] sub_params;                  //Stores inputs to the subsumption system.
+        GAMESTATE game_state;               //The current game state for switch() in update.
+        int dstar_timer;                    //Slows down D* to make it watchable.
+        ContentManager content;             
         SpriteBatch spriteBatch;
-        SpriteFont Font1;
-        Vector2 FontPos;
-        Map main_map;
-        DStar dstar;
+        SpriteFont Font1;                   //Used to draw all text on the screen.
+        Vector2 FontPos;                    
+        Map main_map;                       //Stores and draws static tile map.
+        DStar dstar;                        
         Boat object_boat;
         Robot object_robot;
         //Powermeter object_powermeter;
@@ -53,7 +52,7 @@ namespace WastedSea
         List<Object> button_objects;
         public Texture2D boat, debris, oil, robot, bird,sub_system, sub_selector,powermeter,power;
         Point sub_selector_loc;
-        int[,] actual_cost_array;                           //Stores the sensed data to send to the D*.
+        int[,] actual_cost_array;           //Stores the sensed data to send to the D*.
         int redX = (11 * 25) + 9;
         int redY = (8 * 25) - 7;
         int which = 2;
@@ -75,10 +74,7 @@ namespace WastedSea
 
         #region Initialization
 
-
-        /// <summary>
         /// Constructor.
-        /// </summary>
         public GameplayScreen()
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
@@ -90,12 +86,10 @@ namespace WastedSea
             dstar_timer = 0;
             sub_params = new int[4];
             game_state = GAMESTATE.OTHER;
+            actual_cost_array = new int[24, 32];  
         }
 
-
-        /// <summary>
         /// Load graphics content for the game.
-        /// </summary>
         public override void LoadContent()
         {
             
@@ -160,33 +154,26 @@ namespace WastedSea
             dynamic_objects.Add(object_robot.power);
 
             dstar = new DStar();
-            Thread.Sleep(1000);
+            Thread.Sleep(1000);                  
             ScreenManager.Game.ResetElapsedTime();
             
         }
 
-
-        /// <summary>
         /// Unload graphics content used by the game.
-        /// </summary>
         public override void UnloadContent()
         {
             content.Unload();
         }
-
 
         #endregion
 
         #region Update and Draw
 
 
-        /// <summary>
-        /// Updates the state of the game. This method checks the GameScreen.IsActive
-        /// property, so the game will stop updating when the pause menu is active,
-        /// or if you tab away to a different application.
-        /// </summary>
-        public override void Update(GameTime gameTime, bool otherScreenHasFocus,
-                                                       bool coveredByOtherScreen)
+        //Updates the state of the game. This method checks the GameScreen.IsActive
+        //property, so the game will stop updating when the pause menu is active,
+        //or if you tab away to a different application.
+        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
             if (object_robot.launched)
                 object_robot.timeSinceLaunched++;
@@ -279,8 +266,17 @@ namespace WastedSea
                             }
                             else
                             {
+                                //Launch the robot.
                                 if (DOWN_PRESSED)
                                 {
+                                    for (int y = 0; y < 24; y++)
+                                    {
+                                        for (int x = 0; x < 32; x++)
+                                        {
+                                            //Reset the percept array.
+                                            actual_cost_array[y, x] = 1;
+                                        }
+                                    }
                                     object_robot.Launch(object_boat.pixels_x / 25, object_boat.pixels_y / 25);
                                     DOWN_PRESSED = false;
                                 }
@@ -477,8 +473,6 @@ namespace WastedSea
 
         public void Sense()
         {
-            actual_cost_array = new int[24, 32];
-
             for (int y = 0; y < 24; y++)
             {
                 for (int x = 0; x < 32; x++)
@@ -544,11 +538,9 @@ namespace WastedSea
                 spriteBatch.End();
             }
 
-            DrawString("Score: 0", 0, 0);
-            DrawString(redX.ToString(), 12, 12);
-            //DrawString(Mouse.GetState().ToString(), 0, 0);
-            //DrawString(object_buttonl.x.ToString(), 0, 20);
-            //DrawString(object_buttonl.y.ToString(), 0, 30);
+            DrawString("Power:", 5, 0);
+            DrawString("Score:", 5, 25);
+           
             
             // If the game is transitioning on or off, fade it out to black.
             if (TransitionPosition > 0)

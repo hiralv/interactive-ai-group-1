@@ -275,13 +275,13 @@ namespace WastedSea
                     //Robot.sensedOil.Remove(oil);
 
                     if (oil.x > x)
-                        Move(1);
+                        Move(elapsed_game_time, 1);
                     else if (oil.x < x)
-                        Move(0);
+                        Move(elapsed_game_time, 0);
                     else if (oil.y > y)
-                        Move(3);
+                        Move(elapsed_game_time, 3);
                     else if (oil.y < y)
-                        Move(2);
+                        Move(elapsed_game_time,2);
 
 
                     if (x == oil.x && oil.y == y)
@@ -797,13 +797,15 @@ namespace WastedSea
 
     public class Powermeter : Object
     {
-        public int energy;
+        //public int energy;
         public Texture2D power;
+        public float energy;
+        public float max_energy;
         
         public Powermeter(int x, int y, Texture2D texture, SpriteBatch spriteBatch, Texture2D power, int energy)
             : base(x, y, texture, spriteBatch)
         {
-            this.energy = energy;
+            this.energy = energy = 1.0f;
             type = ObjectType.POWERMETER;
             this.power = power;
         }
@@ -815,12 +817,8 @@ namespace WastedSea
 
         public override void Draw()
         {
-            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
-
-            for (int i = 0; i < energy; i++)
-            {
-                spriteBatch.Draw(power, new Rectangle(pixels_x + (i*power.Width+1), pixels_y + 4, power.Width, power.Height), Color.White);
-            }
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, 100, 25), Color.White);
+            spriteBatch.Draw(power, new Rectangle(pixels_x + 5, pixels_y + 4, (int)(energy * (100-12)), 15), Color.White);
         }
     }
 }
