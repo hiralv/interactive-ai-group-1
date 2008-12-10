@@ -150,7 +150,7 @@ namespace WastedSea
             //Add powermeter
             powermeter = content.Load<Texture2D>(@"powermeter");
             power = content.Load<Texture2D>(@"power");
-            object_robot.power = new Powermeter(3, 0, powermeter, spriteBatch, power, energyValue);
+            object_robot.power = new Powermeter(3, 0, powermeter, spriteBatch, power);
             dynamic_objects.Add(object_robot.power);
 
             dstar = new DStar();
@@ -361,7 +361,7 @@ namespace WastedSea
                                         if (energyValue > 0)
                                         {
                                             energyValue--;
-                                            object_robot.power.energy = energyValue;
+                                            object_robot.retenergy = (float)(energyValue * 0.01);
                                         }
                                     }
                                     else if (which == 3) //Min Depth
@@ -401,9 +401,9 @@ namespace WastedSea
                                     if (which == 2) //Energy Value
                                     {
                                         if (energyValue < 10)
-                                        {
+                                        { 
                                             energyValue++;
-                                            object_robot.power.energy = energyValue;
+                                            object_robot.retenergy = (float)(energyValue * 0.01);
                                         }
                                     }
                                     else if (which == 3) //Min Value

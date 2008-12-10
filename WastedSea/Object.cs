@@ -109,7 +109,7 @@ namespace WastedSea
                 pixels_y = y_max * grid_to_pixels;
             }
 
-            pixels_y = y * grid_to_pixels;
+            //pixels_y = y * grid_to_pixels;
             y = (int)Math.Floor((double)(pixels_y / 25));
         }
 
@@ -125,7 +125,7 @@ namespace WastedSea
                 pixels_y = y_max * grid_to_pixels;
             }
 
-            pixels_y = y * grid_to_pixels;
+            //pixels_y = y * grid_to_pixels;
             y = (int)Math.Floor((double)(pixels_y / 25));
         }
 
@@ -141,7 +141,7 @@ namespace WastedSea
                 pixels_x = 0;
             }
 
-            pixels_x = x * grid_to_pixels;
+            //pixels_x = x * grid_to_pixels;
             x = (int)Math.Floor((double)(pixels_x / 25));
         }
 
@@ -157,7 +157,7 @@ namespace WastedSea
                 pixels_x = x_max * grid_to_pixels;
             }
 
-            pixels_x = x * grid_to_pixels;
+            //pixels_x = x * grid_to_pixels;
             x = (int)Math.Floor((double)(pixels_x / 25));
         }
 
@@ -179,6 +179,7 @@ namespace WastedSea
         public int depth;
         public static List<Oil> sensedOil = new List<Oil>();
         public static List<Oil> removeOil = new List<Oil>();
+        public float retenergy;
         DStar dstar;
         int[,] actual_cost_array;
         public int[,] areaKnowledge;
@@ -186,6 +187,7 @@ namespace WastedSea
         int dstar_timer;                                    //Stores time since last D* update request.
         int dstar_interval;                                 //How often to request a move from D* (interpolate inbetween).
         Square last_dstar_move;                             //Stores the last move received from D*.
+        int prev_direc;
         
         
         #endregion
@@ -212,6 +214,7 @@ namespace WastedSea
             timeSinceLaunched = 0;
             maxDepth = y_max - 4;
             areaKnowledge = new int[24, 32];
+            prev_direc = -1;
             
 
             for (int i = 0; i < 24; i++)
@@ -231,7 +234,6 @@ namespace WastedSea
         {
             launched = false;
         }
-
         
         public override void Think(TimeSpan elapsed_game_time)
         {
@@ -271,14 +273,15 @@ namespace WastedSea
             //    }
             //}
             #endregion
-            if (timeSinceLaunched % 120 == 0 && launched)
-                power.energy--;
+
+            //if (timeSinceLaunched % 120 == 0 && launched)
+            //    power.energy--;
 
             depth = y - 4;
 
             if (launched)
             {
-                if (power.energy < 3)
+                if (retenergy > power.energy)
                 {
                     Retun();
                     actual_cost_array = new int[24, 32];
@@ -289,6 +292,7 @@ namespace WastedSea
                 }
                 else if (depth < minDepth)//This would be changed to the oil value presumably
                 {
+                    power.energy -= 0.0025f;
                     MoveDown(elapsed_game_time);
                 }
                 //else if (maxDepth < 100)//This would be changed to the oil value presumably
@@ -343,9 +347,13 @@ namespace WastedSea
                     //int direction = GetDirection(x, y, maxOilRange);
 
                     int direction = GetRandomDirecion();
-                    //Random ran = new Random();
-                    //int direction = ran.Next(0, 4);
+
+                    Random ran = new Random();
+                    if(prev_direc == direction)
+                        direction = ran.Next(0, 4);
+
                     Move(elapsed_game_time, direction);
+                    prev_direc = direction;
 
                     
 
@@ -592,6 +600,7 @@ namespace WastedSea
 
             }
             areaKnowledge[y, x] -= 15;
+            power.energy -= 0.0025f;
         }
 
         private void SenseOil()
@@ -609,7 +618,7 @@ namespace WastedSea
                     if(oil.x > minDepth)
                     {
                         //power.energy = power.energy - Math.Max(xdiff, ydiff);
-                        power.energy = power.energy--;
+                        power.energy -= 0.005f;
                         Robot.sensedOil.Add(oil);
                         //areaKnowledge[oil.y, oil.x] = 500;
                     }
@@ -856,7 +865,7 @@ namespace WastedSea
         public float energy;
         public float max_energy;
         
-        public Powermeter(int x, int y, Texture2D texture, SpriteBatch spriteBatch, Texture2D power, int energy)
+        public Powermeter(int x, int y, Texture2D texture, SpriteBatch spriteBatch, Texture2D power)
             : base(x, y, texture, spriteBatch)
         {
             this.energy = 1.0f;
