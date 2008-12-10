@@ -77,6 +77,21 @@ namespace WastedSea
             pixels_y = y * 25;
         }
 
+        public int LegalX(int num)
+        {
+            num = Math.Max(num, 0);
+            num = Math.Min(num, 31);
+            return num;
+        }
+
+        public int LegalY(int num)
+        {
+            num = Math.Max(num, 0);
+            num = Math.Min(num, 23);
+            return num;
+        }
+
+
         public virtual void Draw()
         {
             spriteBatch.Draw(texture, new Rectangle(x * grid_to_pixels, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
@@ -94,6 +109,7 @@ namespace WastedSea
                 pixels_y = y_max * grid_to_pixels;
             }
 
+            pixels_y = y * grid_to_pixels;
             y = (int)Math.Floor((double)(pixels_y / 25));
         }
 
@@ -109,6 +125,7 @@ namespace WastedSea
                 pixels_y = y_max * grid_to_pixels;
             }
 
+            pixels_y = y * grid_to_pixels;
             y = (int)Math.Floor((double)(pixels_y / 25));
         }
 
@@ -123,6 +140,8 @@ namespace WastedSea
             {
                 pixels_x = 0;
             }
+
+            pixels_x = x * grid_to_pixels;
             x = (int)Math.Floor((double)(pixels_x / 25));
         }
 
@@ -138,6 +157,7 @@ namespace WastedSea
                 pixels_x = x_max * grid_to_pixels;
             }
 
+            pixels_x = x * grid_to_pixels;
             x = (int)Math.Floor((double)(pixels_x / 25));
         }
 
@@ -163,7 +183,10 @@ namespace WastedSea
         int[,] actual_cost_array;
         public int[,] areaKnowledge;
         public int boatx, boaty;
-        int dstar_timer;
+        int dstar_timer;                                    //Stores time since last D* update request.
+        int dstar_interval;                                 //How often to request a move from D* (interpolate inbetween).
+        Square last_dstar_move;                             //Stores the last move received from D*.
+        
         
         #endregion
 
@@ -175,6 +198,8 @@ namespace WastedSea
             moving_left = true;
             speed = 100;
             dstar = new DStar();
+            dstar_interval = 100;
+            dstar_timer = -1;
         }
 
         public void Launch(int x, int y)
@@ -256,6 +281,8 @@ namespace WastedSea
                 if (power.energy < 3)
                 {
                     Retun();
+                    actual_cost_array = new int[24, 32];
+                    dstar = new DStar();
                     dstar.Start(pixels_x / 25, pixels_y / 25, (int)Math.Floor((double)boatx / 25), (int)Math.Floor((double)boaty / 25));
                     
                     //RETURNTOBOAT!
@@ -355,15 +382,43 @@ namespace WastedSea
             if (dstar.STARTED)
             {
                 dstar_timer += (int)elapsed_game_time.Milliseconds;
-                if (dstar_timer > 100)
+
+                //If enough time has passed, get next move from D*.
+                if (dstar_timer > dstar_interval || dstar_timer == -1)
                 {
                     SenseDerbis();
                     Square move = dstar.Think(actual_cost_array);
                     if (move != null)
                     {
-                        SetPosition(move.j, move.i);
+                        //SetPosition(move.j, move.i);
+                        last_dstar_move = move;
                     }
                     dstar_timer = 0;
+                }
+                //Else interpolate the D* move to the pixel level from the grid level.
+                else
+                {
+                    if (last_dstar_move != null)
+                    {
+                        int x1 = (pixels_x);
+                        int y1 = (pixels_y);
+                        int x2 = last_dstar_move.j * grid_to_pixels;
+                        int y2 = last_dstar_move.i * grid_to_pixels;
+
+                        int dx = x2 - x1;
+                        int dy = y2 - y1;
+
+                        float interval = dstar_timer / dstar_interval;
+
+                        pixels_x = (int)(x1 + (interval * dx));
+                        pixels_y = (int)(y1 + (interval * dy));
+                        
+                        x = pixels_x / grid_to_pixels;
+                        y = pixels_y / grid_to_pixels;
+                    }
+
+                    //SetPosition(move.j, move.i);
+
                 }
             } 
             #endregion
@@ -569,20 +624,19 @@ namespace WastedSea
 
         private void SenseDerbis()
         {
-            actual_cost_array = new int[24, 32];
+            int sensor_distance = 5;
+            //actual_cost_array = new int[24, 32];
 
-            for (int y = 0; y < 24; y++)
+
+            for (int j = LegalX(x-sensor_distance); j < LegalX(x+sensor_distance); j++)
             {
-                for (int x = 0; x < 32; x++)
+                for (int i = LegalY(y - sensor_distance); i < LegalY(y + sensor_distance); i++)
                 {
-                    actual_cost_array[y, x] = 0;
-
                     foreach (Object o in Debris.derbislist)
                     {
-                        if (o.pixels_x / 25 == x && o.pixels_y / 25 == y)
+                        if (o.pixels_x / 25 == j && o.pixels_y / 25 == i)
                         {
-                            //Debris is in the way.
-                            actual_cost_array[y, x] = 99;
+                            actual_cost_array[i, j] = 99;
                             break;
                         }
                     }
@@ -805,7 +859,7 @@ namespace WastedSea
         public Powermeter(int x, int y, Texture2D texture, SpriteBatch spriteBatch, Texture2D power, int energy)
             : base(x, y, texture, spriteBatch)
         {
-            this.energy = energy = 1.0f;
+            this.energy = 1.0f;
             type = ObjectType.POWERMETER;
             this.power = power;
         }

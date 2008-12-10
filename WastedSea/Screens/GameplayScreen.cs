@@ -252,7 +252,9 @@ namespace WastedSea
                                 {
                                     if (!dstar.STARTED && object_robot.launched)
                                     {
+                                        dstar = new DStar();
                                         object_robot.Retun();
+
                                         //Run D* and bring robot home.
                                         dstar.Start(object_robot.pixels_x / 25, object_robot.pixels_y / 25, object_boat.pixels_x / 25, object_boat.pixels_y / 25);
                                     }
@@ -260,7 +262,7 @@ namespace WastedSea
                                 }
                             }
 
-                            if (ks.IsKeyDown(Keys.Down))            //Space bar.
+                            if (ks.IsKeyDown(Keys.Down))           
                             {
                                 DOWN_PRESSED = true;
                             }
