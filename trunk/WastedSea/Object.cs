@@ -213,7 +213,7 @@ namespace WastedSea
             pixels_y = y * grid_to_pixels;
             launched = true;
             timeSinceLaunched = 0;
-            maxDepth = y_max - 4;
+            //maxDepth = y_max - 4;
             areaKnowledge = new int[24, 32];
             prev_direc = -1;
             step = new int[24, 32];
@@ -224,7 +224,7 @@ namespace WastedSea
                     areaKnowledge[i, j] = -99999;
             }
 
-            for (int i = minDepth + 5; i < maxDepth; i++)
+            for (int i = minDepth + 5; i < maxDepth + 5; i++)
             {
                 for (int j = 0; j < 32; j++)
                     areaKnowledge[i, j] = 1;
@@ -279,7 +279,7 @@ namespace WastedSea
             //if (timeSinceLaunched % 120 == 0 && launched)
             //    power.energy--;
 
-            depth = y - 4;
+            depth = y - 5;
 
             if (launched)
             {
@@ -292,15 +292,16 @@ namespace WastedSea
                     
                     //RETURNTOBOAT!
                 }
-                else if (depth < minDepth)//This would be changed to the oil value presumably
+                else if (depth - 1 < minDepth)//This would be changed to the oil value presumably
                 {
                     power.energy -= 0.0025f;
                     MoveDown(elapsed_game_time);
                 }
-                //else if (maxDepth < 100)//This would be changed to the oil value presumably
-                //{
-                //    MoveUp(elapsed_game_time);
-                //}
+                else if (depth + 1 > maxDepth)//This would be changed to the oil value presumably
+                {
+                    power.energy -= 0.0025f;
+                    MoveUp(elapsed_game_time);
+                }
                 else if (Robot.sensedOil.Count > 0)//Tells how close agent is to oil
                 {
 
@@ -729,10 +730,10 @@ namespace WastedSea
                 xdiff = Math.Abs(x - oil.x);
                 ydiff = Math.Abs(y - oil.y);
 
-                if (xdiff <= maxOilRange && ydiff <= maxOilRange)
+                if (xdiff < maxOilRange && ydiff < maxOilRange)
                 {
                     //if (oil.x > minDepth && oil.x < maxDepth)
-                    if(oil.x > minDepth + 5)
+                    if(oil.y > minDepth + 5 && oil.y < maxDepth + 5)
                     {
                         //power.energy = power.energy - Math.Max(xdiff, ydiff);
                         power.energy -= 0.005f;
