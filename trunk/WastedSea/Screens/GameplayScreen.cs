@@ -57,7 +57,7 @@ namespace WastedSea
         int redY = (8 * 25) - 7;
         int which = 2;
         int energyValue = 0;
-        int minValue = 0;
+        int minValue = 2;
         int maxValue = 0;
         int oilRangeValue = 0;
        
@@ -175,8 +175,8 @@ namespace WastedSea
         //or if you tab away to a different application.
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
-            if (object_robot.launched)
-                object_robot.timeSinceLaunched++;
+            //if (object_robot.launched)
+            //    object_robot.timeSinceLaunched++;
 
             //if (object_robot.timeSinceLaunched % 120 == 0 && object_robot.launched)
             //    energyValue--;
@@ -193,6 +193,7 @@ namespace WastedSea
                 foreach (Oil oil in Robot.removeOil)
                 {
                     dynamic_objects.Remove(oil);
+                    //Robot.sensedOil.Remove(oil);
                 }
                 Robot.removeOil.Clear();
             }
@@ -366,14 +367,14 @@ namespace WastedSea
                                     }
                                     else if (which == 3) //Min Depth
                                     {
-                                        if (minValue > 0)
+                                        if (minValue > 2)
                                         {
                                             minValue--;
                                         }
                                     }
                                     else if (which == 4) //Max Depth
                                     {
-                                        if (maxValue > 0)
+                                        if (maxValue > minValue)
                                         {
                                             maxValue--;
                                         }
@@ -411,11 +412,12 @@ namespace WastedSea
                                         if (minValue < 10)
                                         {
                                             minValue++;
+                                            maxValue++;
                                         }
                                     }
                                     else if (which == 4) //Max Value
                                     {
-                                        if (maxValue < 10)
+                                        if (maxValue < 25)
                                         {
                                             maxValue++;
                                         }
