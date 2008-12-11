@@ -15,8 +15,8 @@
     <Thumbnail>GameThumbnail.png</Thumbnail>
     <ManifestCertificateThumbprint>0EC70793AB88887983CD4A3D8A86F3EC6ECB60C6</ManifestCertificateThumbprint>
     <ManifestKeyFile>WastedSea_TemporaryKey.pfx</ManifestKeyFile>
-    <GenerateManifests>true</GenerateManifests>
-    <SignManifests>true</SignManifests>
+    <GenerateManifests>false</GenerateManifests>
+    <SignManifests>false</SignManifests>
     <PublishUrl>publish\wastedseatry1\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -30,6 +30,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetZone>LocalIntranet</TargetZone>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -127,6 +128,7 @@
     </NestedContentProject>
   </ItemGroup>
   <ItemGroup>
+    <BaseApplicationManifest Include="Properties\app.manifest" />
     <None Include="WastedSea_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
