@@ -205,6 +205,7 @@ namespace WastedSea
             dstar_timer = -1;
         }
 
+        // Laund the robot
         public void Launch(int x, int y)
         {
             this.x = x;
@@ -232,11 +233,13 @@ namespace WastedSea
 
         }
 
+        // Return home
         public void Retun()
         {
             launched = false;
         }
         
+        // Subsumption Architecture
         public override void Think(TimeSpan elapsed_game_time)
         {
             #region Move Left Right
@@ -279,7 +282,7 @@ namespace WastedSea
             //if (timeSinceLaunched % 120 == 0 && launched)
             //    power.energy--;
 
-            depth = y - 5;
+            depth = y - 4;
 
             if (launched)
             {
@@ -292,12 +295,12 @@ namespace WastedSea
                     
                     //RETURNTOBOAT!
                 }
-                else if (depth - 1 < minDepth)//This would be changed to the oil value presumably
+                else if (depth < minDepth)//This would be changed to the oil value presumably
                 {
                     power.energy -= 0.0025f;
                     MoveDown(elapsed_game_time);
                 }
-                else if (depth + 1 > maxDepth)//This would be changed to the oil value presumably
+                else if (depth > maxDepth)//This would be changed to the oil value presumably
                 {
                     power.energy -= 0.0025f;
                     MoveUp(elapsed_game_time);
@@ -322,32 +325,32 @@ namespace WastedSea
                             Move(elapsed_game_time, 1);
                         else if (oil.x < x)
                             Move(elapsed_game_time, 0);
-
-                        if (oil.y > y)
+                        else if (oil.y > y)
                             Move(elapsed_game_time, 3);
                         else if (oil.y < y)
                             Move(elapsed_game_time, 2);
                     }
+                    #region Old method
 
-                    
 
+                    //    //foreach (Oil oil in Robot.sensedOil)
+                    //    //{
+                    //    //    if (x == oil.x && y == oil.y)
+                    //    //    {
+                    //    //        Robot.removeOil.Add(oil);
+                    //    //        areaKnowledge[y, x] = -500;
+                    //    //    }
+                    //    //}
 
-                //    //foreach (Oil oil in Robot.sensedOil)
-                //    //{
-                //    //    if (x == oil.x && y == oil.y)
-                //    //    {
-                //    //        Robot.removeOil.Add(oil);
-                //    //        areaKnowledge[y, x] = -500;
-                //    //    }
-                //    //}
+                    //    //foreach (Oil oil in Robot.removeOil)
+                    //    //{
+                    //    //    Robot.sensedOil.Remove(oil);
+                    //    //}
 
-                //    //foreach (Oil oil in Robot.removeOil)
-                //    //{
-                //    //    Robot.sensedOil.Remove(oil);
-                //    //}
+                    //    //removeOil.Clear();
+                    //    //CLEANOIL 
+                    #endregion
 
-                //    //removeOil.Clear();
-                //    //CLEANOIL
                 }
                 else
                 {
@@ -441,6 +444,7 @@ namespace WastedSea
             #endregion
         }
 
+        // Get a random direction to move
         private int GetRandomDirecion()
         {
             int direction = ran.Next(0, 8);
@@ -637,6 +641,7 @@ namespace WastedSea
             return direction;
         }
 
+        // Moves int the given direction
         private void Move(TimeSpan elapsed_game_time, int direction)
         {
             switch (direction)
@@ -721,6 +726,7 @@ namespace WastedSea
             
         }
 
+        // Tells if any oil is in the range
         private void SenseOil()
         {
        
@@ -735,20 +741,15 @@ namespace WastedSea
                     //if (oil.x > minDepth && oil.x < maxDepth)
                     if(oil.y > minDepth + 5 && oil.y < maxDepth + 5)
                     {
-                        //power.energy = power.energy - Math.Max(xdiff, ydiff);
                         power.energy -= 0.005f;
                         Robot.sensedOil.Add(oil);
                         //areaKnowledge[oil.y, oil.x] = 500;
                     }
                 }
             }
-
-            //foreach (Oil oil in Robot.sensedOil)
-            //{
-            //    Oil.oil_list.Remove(oil);
-            //}
         }
 
+        // Senses the derbis in the way
         private void SenseDerbis()
         {
             int sensor_distance = 5;
@@ -776,6 +777,7 @@ namespace WastedSea
             spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
         }
 
+        // Get the direction to move
         private int GetDirection(int x, int y, int range)
         {
             int currx = x;
@@ -976,6 +978,7 @@ namespace WastedSea
         }
     }
 
+    // Shows the power of the robot
     public class Powermeter : Object
     {
         //public int energy;
