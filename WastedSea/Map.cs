@@ -43,7 +43,7 @@ namespace WastedSea
         public MapSpace[,] map_array;
         public int[,] map_type_array;
 
-        public Texture2D sea, oil, sky, sea_floor, sea_top;
+        public Texture2D sea, oil, sky, sea_floor, sea_top, water;
 
         public Map(Game game) : base(game)
         {
@@ -67,6 +67,7 @@ namespace WastedSea
             sky = Content.Load<Texture2D>(@"Sky");
             sea_floor = Content.Load<Texture2D>(@"SeaFloor");
             sea_top = Content.Load<Texture2D>(@"SeaTop");
+            water = Content.Load<Texture2D>(@"water");
 
             base.Initialize();
         }
@@ -85,6 +86,7 @@ namespace WastedSea
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
+            spriteBatch.Draw(water, new Rectangle(0, 98, water.Width, water.Height), Color.White);
 
             for (int y = 0; y < 24; y++)
             {
@@ -101,7 +103,8 @@ namespace WastedSea
                             }
                         case 1:
                             {
-                                tile = sea;
+                                //tile = sea;
+                                tile = null;
                                 break;
                             }
                         case 4:
@@ -116,16 +119,19 @@ namespace WastedSea
                             }
                         case 6:
                             {
-                                tile = sea_top;
+                                //tile = sea_top;
+                                tile = null;
                                 break;
                             }
                         default:
                             {
-                                tile = sea;
+                                //tile = sea;
+                                tile = null;
                                 break;
                             }
                     }
-                    spriteBatch.Draw(tile, new Rectangle(x * 25, y * 25, tile.Width, tile.Height), Color.White);
+                    if(tile != null)
+                        spriteBatch.Draw(tile, new Rectangle(x * 25, y * 25, tile.Width, tile.Height), Color.White);
                 }
             }
 

@@ -102,7 +102,7 @@ namespace WastedSea
             main_map.Initialize(ScreenManager.GraphicsDevice, content);
             boat = content.Load<Texture2D>(@"Boat");
             object_boat = new Boat(10, 4, boat, spriteBatch);
-            debris = content.Load<Texture2D>(@"Debris");
+            debris = content.Load<Texture2D>(@"vDebris");
             oil = content.Load<Texture2D>(@"Oil");
             object_boat = new Boat(10, 4, boat, spriteBatch);
             dynamic_objects.Add(object_boat);
@@ -446,6 +446,7 @@ namespace WastedSea
                                 }
                             }
 
+                            #region Old Subsumption
                             //Subsumption Architecture hurr...
                             if (energyValue < 4)
                             {
@@ -453,7 +454,7 @@ namespace WastedSea
                             }
                             else if (minValue > 3)//This would be changed to the oil value presumably
                             {
-                                object_robot.MoveDown(gameTime.ElapsedGameTime);
+                                //object_robot.MoveDown(gameTime.ElapsedGameTime);
                             }
                             else if (maxValue < 100)//This would be changed to the oil value presumably
                             {
@@ -467,6 +468,8 @@ namespace WastedSea
                             {
                                 //WALK_RANDOMLY
                             }
+                            
+                            #endregion
 
                             break;
                         }
