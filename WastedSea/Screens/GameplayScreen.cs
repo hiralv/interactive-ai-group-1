@@ -58,8 +58,8 @@ namespace WastedSea
         int which = 2;
         int energyValue = 0;
         int minValue = 2;
-        int maxValue = 0;
-        int oilRangeValue = 0;
+        int maxValue = 2;
+        int oilRangeValue = 1;
        
         Random random = new Random();
 
