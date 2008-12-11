@@ -409,7 +409,7 @@ namespace WastedSea
                                     }
                                     else if (which == 3) //Min Value
                                     {
-                                        if (minValue < 10)
+                                        if (minValue < 17)
                                         {
                                             minValue++;
                                             maxValue++;
@@ -417,7 +417,7 @@ namespace WastedSea
                                     }
                                     else if (which == 4) //Max Value
                                     {
-                                        if (maxValue < 25)
+                                        if (maxValue < 19)
                                         {
                                             maxValue++;
                                         }
