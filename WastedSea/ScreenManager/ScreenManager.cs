@@ -12,6 +12,7 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -36,6 +37,7 @@ namespace WastedSea
         SpriteBatch spriteBatch;
         SpriteFont font;
         Texture2D blankTexture;
+        SoundBank soundBank;
 
         bool isInitialized;
 
@@ -45,6 +47,11 @@ namespace WastedSea
 
         #region Properties
 
+        public SoundBank SoundBank
+        {
+            get { return soundBank; }
+            set { soundBank = value; }
+        }
 
         /// <summary>
         /// A default SpriteBatch shared by all the screens. This saves
@@ -234,6 +241,7 @@ namespace WastedSea
         /// </summary>
         public void AddScreen(GameScreen screen)
         {
+            screen.SoundBank = this.SoundBank;
             screen.ScreenManager = this;
             screen.IsExiting = false;
 

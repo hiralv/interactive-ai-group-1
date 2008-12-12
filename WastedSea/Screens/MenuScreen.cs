@@ -74,6 +74,8 @@ namespace WastedSea
             // Move to the previous menu entry?
             if (input.MenuUp)
             {
+                this.SoundBank.PlayCue("menu_select");
+
                 selectedEntry--;
 
                 if (selectedEntry < 0)
@@ -83,6 +85,8 @@ namespace WastedSea
             // Move to the next menu entry?
             if (input.MenuDown)
             {
+                this.SoundBank.PlayCue("menu_select");
+
                 selectedEntry++;
 
                 if (selectedEntry >= menuEntries.Count)
@@ -92,10 +96,14 @@ namespace WastedSea
             // Accept or cancel the menu?
             if (input.MenuSelect)
             {
+                this.SoundBank.PlayCue("menu_ok");
+
                 OnSelectEntry(selectedEntry);
             }
             else if (input.MenuCancel)
             {
+                this.SoundBank.PlayCue("menu_back");
+
                 OnCancel();
             }
         }

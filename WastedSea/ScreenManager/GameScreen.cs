@@ -10,6 +10,7 @@
 #region Using Statements
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 #endregion
 
 namespace WastedSea
@@ -37,6 +38,12 @@ namespace WastedSea
     {
         #region Properties
 
+        public SoundBank SoundBank
+        {
+            get { return soundBank; }
+            internal set { soundBank = value; }
+        }
+        SoundBank soundBank;
 
         /// <summary>
         /// Normally when one screen is brought up over the top of another,
