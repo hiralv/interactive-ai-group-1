@@ -172,7 +172,7 @@ namespace WastedSea {
         int prev_direc;
         int score;                                          //Stores scored points for the main update to add to the score each cycle.
         float power_to_move;
-        bool FAILED;
+        public bool FAILED;
 
         #endregion
 
@@ -291,18 +291,22 @@ namespace WastedSea {
                 //If enough time has passed, get next move from D*.
                 if(dstar_timer > dstar_interval || dstar_timer == -1) {
                     //power.Reset();
-                    if(power.energy > power_to_move) {
+                    if (power.energy > power_to_move)
+                    {
                         power.Consume(power_to_move);
 
                         SenseDerbis();
                         Square move = dstar.Think(actual_cost_array);
-                        if(move != null) {
+                        if (move != null)
+                        {
                             //SetPosition(move.j, move.i);
                             last_dstar_move = move;
                         }
 
                         dstar_timer = 0;
-                    } else {
+                    }
+                    else
+                    {
                         last_dstar_move = null;
                         FAILED = true;
                     }

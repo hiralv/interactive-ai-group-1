@@ -38,7 +38,12 @@ namespace WastedSea
 
         GraphicsDeviceManager graphics;
         ScreenManager screenManager;
+        AudioEngine audioEngine;
+        WaveBank waveBank;
+        SoundBank soundBank;
 
+        bool isMusicPlaying;
+        
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -47,6 +52,12 @@ namespace WastedSea
             screenManager = new ScreenManager(this);
             Components.Add(screenManager);
             this.IsMouseVisible = true;
+
+            audioEngine = new AudioEngine(@"Content\sfx.xgs");
+            waveBank = new WaveBank(audioEngine, @"Content\wave bank.xwb");
+            soundBank = new SoundBank(audioEngine, @"Content\sound bank.xsb");
+
+            screenManager.SoundBank = soundBank;
 
             screenManager.AddScreen(new BackgroundScreen());
             screenManager.AddScreen(new MainMenuScreen());
@@ -130,6 +141,12 @@ namespace WastedSea
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (!isMusicPlaying)
+            {
+                soundBank.PlayCue("bgm");
+                isMusicPlaying = true;
+            }
+
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();

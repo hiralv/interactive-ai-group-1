@@ -24,10 +24,13 @@ namespace WastedSea {
     enum GAMESTATE {
         SUBSYSTEM,
         OTHER
-    }
+    }   
 
     /** State manager class. */
     class GameplayScreen : GameScreen {
+       
+        const int CawDuration = 9000;
+
         #region Fields
 
         int[] sub_params;                  //Stores inputs to the subsumption system.
@@ -48,17 +51,21 @@ namespace WastedSea {
         List<Object> button_objects;
         public Texture2D boat, debris, oil, robot, bird, sub_system, sub_selector, powermeter, power1, power2, power3;
         Point sub_selector_loc;
+        int selectorGlow = 1;
         int[,] actual_cost_array;           //Stores the sensed data to send to the D*.
         int redX = (11 * 25) + 9;
         int redY = (8 * 25) - 7;
-        int which = 2;
+        int which = 1;
         int energyValue = 0;
         int minValue = 2;
         int maxValue = 2;
         int oilRangeValue = 1;
-        int score;
+        int score;        
 
         Random random = new Random();
+        DateTime lastCaw = DateTime.Now;   //seagulls
+        int nextCaw = -7000;
+        bool failSoundPlayed;
 
         //Variables to keep track of key releases.
         bool SPACE_PRESSED = false;
@@ -66,6 +73,13 @@ namespace WastedSea {
         bool DOWN_PRESSED = false;
         bool LEFT_PRESSED = false;
         bool RIGHT_PRESSED = false;
+
+        // points for redX/Y
+        Point[] redSquares = new Point[]{
+            new Point(284,193),
+            new Point(285,238),
+            new Point(285,278),
+            new Point(285,316)};
 
         #endregion
 
@@ -176,7 +190,17 @@ namespace WastedSea {
         #region Update and Draw
 
         /** The base update function. */
-        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen) {
+        public override void  Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen) {
+
+            TimeSpan deltaCaw = DateTime.Now.Subtract(lastCaw);
+            if ((int)deltaCaw.TotalMilliseconds >= (CawDuration + nextCaw))
+            {
+                this.SoundBank.PlayCue("seagull");
+                lastCaw = DateTime.Now;
+
+                nextCaw = random.Next(2000, 5000);
+            }
+            
             object_robot.minDepth = minValue;
             object_robot.maxDepth = maxValue;
             object_robot.maxOilRange = oilRangeValue;
@@ -187,6 +211,8 @@ namespace WastedSea {
                 foreach(Oil oil in Robot.removeOil) {
                     dynamic_objects.Remove(oil);
                     score += 50;
+
+                    this.SoundBank.PlayCue("clean_oil");
                 }
                 Robot.removeOil.Clear();
             }
@@ -218,6 +244,7 @@ namespace WastedSea {
                             } else {
                                 if(SPACE_PRESSED) {
                                     if(game_state == GAMESTATE.SUBSYSTEM) {
+                                        this.SoundBank.PlayCue("menu_back");
                                         game_state = GAMESTATE.OTHER;
                                     } else {
                                         game_state = GAMESTATE.SUBSYSTEM;
@@ -232,18 +259,29 @@ namespace WastedSea {
                             } else {
                                 if(DOWN_PRESSED) {
                                     if(!object_robot.launched) {
+
+                                        this.SoundBank.PlayCue("robot");
+                                        
                                         object_robot.retenergy = (float)(energyValue);
                                         object_robot.power.Reset();
                                         object_lives_left_bar.UseLife();
                                         object_robot.Launch(object_boat.pixels_x / 25, object_boat.pixels_y / 25);
+                                        failSoundPlayed = false;
                                     }
                                     DOWN_PRESSED = false;
                                 }
                             }
 
                             //Allow our dynamic game objects their think cycle.
-                            foreach(Object o in dynamic_objects) {
+                            foreach (Object o in dynamic_objects)
+                            {
                                 o.Think(gameTime.ElapsedGameTime);
+                            }
+
+                            if (object_robot.power.energy <= 1.0 && !failSoundPlayed)
+                            {
+                                this.SoundBank.PlayCue("power_down");
+                                failSoundPlayed = true;
                             }
 
                             break;
@@ -251,49 +289,43 @@ namespace WastedSea {
 
                     case GAMESTATE.SUBSYSTEM: {
                             if(ks.IsKeyDown(Keys.Down)) {
+                                UP_PRESSED = false;
                                 DOWN_PRESSED = true;
                             } else {
                                 //Move Selector to pick levels
                                 if(DOWN_PRESSED) {
-                                    if(which == 2) {
-                                        redY += 45;
-                                        redX += 1;
-                                        which++;
-                                    } else if(which == 3) {
-                                        redY += 40;
-                                        which++;
-                                    } else if(which == 4) {
-                                        redY += 38;
+
+                                    this.SoundBank.PlayCue("menu_select");
+
+                                    which++;
+                                    if (which > 4)
                                         which = 1;
-                                    } else {
-                                        redY = (8 * 25) - 7;
-                                        redX -= 1;
-                                        which++;
-                                    }
+
+                                    redX = redSquares[which-1].X;
+                                    redY = redSquares[which-1].Y;
+
+                                    UP_PRESSED = false;
                                     DOWN_PRESSED = false;
                                 }
                             }
 
                             if(ks.IsKeyDown(Keys.Up)) {
+                                DOWN_PRESSED = false;
                                 UP_PRESSED = true;
                             } else {
                                 //Move Selector to pick levels
                                 if(UP_PRESSED) {
-                                    if(which == 2) {
-                                        redY += 45;
-                                        redX += 1;
-                                        which++;
-                                    } else if(which == 3) {
-                                        redY += 40;
-                                        which++;
-                                    } else if(which == 4) {
-                                        redY += 38;
-                                        which = 1;
-                                    } else {
-                                        redY = (8 * 25) - 7;
-                                        redX -= 1;
-                                        which++;
-                                    }
+
+                                    this.SoundBank.PlayCue("menu_select");
+
+                                    which--;
+                                    if (which < 1)
+                                        which = 4;
+
+                                    redX = redSquares[which-1].X;
+                                    redY = redSquares[which-1].Y;
+
+                                    DOWN_PRESSED = false;
                                     UP_PRESSED = false;
                                 }
                             }
@@ -303,17 +335,20 @@ namespace WastedSea {
                                 LEFT_PRESSED = true;
                             } else {
                                 if(LEFT_PRESSED) {
-                                    if(which == 2) //EnergyValue
+
+                                    this.SoundBank.PlayCue("click");
+
+                                    if(which == 1) //EnergyValue
                                     {
                                         if(energyValue > 0) {
                                             energyValue--;
                                         }
-                                    } else if(which == 3) //Min Depth
+                                    } else if(which == 2) //Min Depth
                                     {
                                         if(minValue > 2) {
                                             minValue--;
                                         }
-                                    } else if(which == 4) //Max Depth
+                                    } else if(which == 3) //Max Depth
                                     {
                                         if(maxValue > minValue) {
                                             maxValue--;
@@ -333,18 +368,24 @@ namespace WastedSea {
                                 RIGHT_PRESSED = true;
                             } else {
                                 if(RIGHT_PRESSED) {
-                                    if(which == 2) //Energy Value
+
+                                    this.SoundBank.PlayCue("click");
+
+                                    if(which == 1) //Energy Value
                                     {
-                                        if(energyValue < 100) {
+                                        if (energyValue < 100)
+                                        {
+                                            energyValue++;
                                             object_robot.retenergy = (float)(energyValue);
-                                        }
-                                    } else if(which == 3) //Min Value
+                                        }                                            
+
+                                    } else if(which == 2) //Min Value
                                     {
                                         if(minValue < 17) {
                                             minValue++;
                                             maxValue++;
                                         }
-                                    } else if(which == 4) //Max Value
+                                    } else if(which == 3) //Max Value
                                     {
                                         if(maxValue < 19) {
                                             maxValue++;
@@ -364,6 +405,9 @@ namespace WastedSea {
                                 SPACE_PRESSED = true;
                             } else {
                                 if(SPACE_PRESSED) {
+
+                                    this.SoundBank.PlayCue("menu_back");
+
                                     game_state = GAMESTATE.OTHER;
                                     SPACE_PRESSED = false;
                                 }
@@ -430,10 +474,18 @@ namespace WastedSea {
                 //DrawCostGrid();
             }
 
-            if(game_state == GAMESTATE.SUBSYSTEM) {
+            if (game_state == GAMESTATE.SUBSYSTEM)
+            {
+
+                selectorGlow += 3;
+                if (selectorGlow > 36)
+                    selectorGlow = 0;
+
+
                 spriteBatch.Begin();
                 spriteBatch.Draw(sub_system, new Rectangle((6 * 25) + 0, (6 * 25) + 0, sub_system.Width, sub_system.Height), Color.White);
                 spriteBatch.Draw(sub_selector, new Rectangle(redX, redY, sub_selector.Width, sub_selector.Height), Color.White);
+                spriteBatch.Draw(sub_selector, new Rectangle(redX - selectorGlow / 9, redY - selectorGlow / 9, sub_selector.Width + selectorGlow / 9 * 2, sub_selector.Height + selectorGlow / 9 * 2), Color.White);
                 spriteBatch.End();
 
                 DrawString(energyValue.ToString(), 289, 195);
