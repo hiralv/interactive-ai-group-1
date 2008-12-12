@@ -41,6 +41,7 @@ namespace WastedSea {
         DStar dstar;
         Boat object_boat;
         Robot object_robot;
+        LivesLeftBar object_lives_left_bar;
         //Powermeter object_powermeter;
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
@@ -55,6 +56,7 @@ namespace WastedSea {
         int minValue = 2;
         int maxValue = 2;
         int oilRangeValue = 1;
+        int score;
 
         Random random = new Random();
 
@@ -108,7 +110,7 @@ namespace WastedSea {
             Random ran_number = new Random();
 
             //Create all of the debris.
-            int MAX_DEBRIS = 200;
+            int MAX_DEBRIS = 25;
             Debris new_debris;
             for(int i = 0; i < MAX_DEBRIS; i++) {
                 int ran_x = ran_number.Next(0, 31);
@@ -119,9 +121,9 @@ namespace WastedSea {
             }
 
             bird = content.Load<Texture2D>(@"vBird");
-            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(0, 2), bird, spriteBatch));
-            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(0, 2), bird, spriteBatch));
-            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(0, 2), bird, spriteBatch));
+            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(1, 2), bird, spriteBatch));
+            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(1, 2), bird, spriteBatch));
+            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(1, 2), bird, spriteBatch));
 
             //Create all of the oil.
             int MAX_OIL = 30;
@@ -145,18 +147,20 @@ namespace WastedSea {
             object_robot.power = new Powermeter(3, 0, powermeter, spriteBatch, power);
             dynamic_objects.Add(object_robot.power);
 
+            //Create the lives left bar.
+            object_lives_left_bar = new LivesLeftBar(11, 0, robot, spriteBatch);
+            dynamic_objects.Add(object_lives_left_bar);
 
             //Default values for the subsumption system.
-            energyValue     = 20;
-            minValue        = 3;
-            maxValue        = 20;
-            oilRangeValue   = 10;
+            energyValue = 20;
+            minValue = 3;
+            maxValue = 20;
+            oilRangeValue = 10;
 
+            score = 0;
 
-            dstar = new DStar();
             Thread.Sleep(1000);
             ScreenManager.Game.ResetElapsedTime();
-
         }
 
         //Unload graphics content used by the game.
@@ -170,13 +174,6 @@ namespace WastedSea {
 
         /** The base update function. */
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen) {
-            //if (object_robot.launched)
-            //    object_robot.timeSinceLaunched++;
-
-            //if (object_robot.timeSinceLaunched % 120 == 0 && object_robot.launched)
-            //    energyValue--;
-
-            //object_robot.power.energy = energyValue;
             object_robot.minDepth = minValue;
             object_robot.maxDepth = maxValue;
             object_robot.maxOilRange = oilRangeValue;
@@ -186,12 +183,10 @@ namespace WastedSea {
             if(Robot.removeOil.Count > 0) {
                 foreach(Oil oil in Robot.removeOil) {
                     dynamic_objects.Remove(oil);
-                    //Robot.sensedOil.Remove(oil);
+                    score += 50;
                 }
                 Robot.removeOil.Clear();
             }
-
-            //Robot.sensedOil.Clear();
 
 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
@@ -203,18 +198,15 @@ namespace WastedSea {
 
                 switch(game_state) {
                     case GAMESTATE.OTHER: {
-                            if(ks.IsKeyDown(Keys.Right))       //Right arrow.
-                            {
+                            if(ks.IsKeyDown(Keys.Right)) {         //Right arrow.
                                 object_boat.MoveRight(gameTime.ElapsedGameTime);
                             }
 
-                            if(ks.IsKeyDown(Keys.Left))            //Left arrow.
-                            {
+                            if(ks.IsKeyDown(Keys.Left)){            //Left arrow.
                                 object_boat.MoveLeft(gameTime.ElapsedGameTime);
                             }
 
-                            if(ks.IsKeyDown(Keys.Space))            //Space bar.
-                            {
+                            if(ks.IsKeyDown(Keys.Space)){            //Space bar.
                                 SPACE_PRESSED = true;
                             } else {
                                 if(SPACE_PRESSED) {
@@ -227,51 +219,16 @@ namespace WastedSea {
                                 }
                             }
 
-                            if(ks.IsKeyDown(Keys.Up))            //Space bar.
-                            {
-                                UP_PRESSED = true;
-                            } else {
-                                if(UP_PRESSED) {
-                                    if(!dstar.STARTED && object_robot.launched) {
-                                        dstar = new DStar();
-                                        object_robot.Retun();
-
-                                        //Run D* and bring robot home.
-                                        dstar.Start(object_robot.pixels_x / 25, object_robot.pixels_y / 25, object_boat.pixels_x / 25, object_boat.pixels_y / 25);
-                                    }
-                                    UP_PRESSED = false;
-                                }
-                            }
-
+                            //Launches the robot.
                             if(ks.IsKeyDown(Keys.Down)) {
                                 DOWN_PRESSED = true;
                             } else {
-                                //Launch the robot.
                                 if(DOWN_PRESSED) {
-                                    for(int y = 0; y < 24; y++) {
-                                        for(int x = 0; x < 32; x++) {
-                                            //Reset the percept array.
-                                            actual_cost_array[y, x] = 1;
-                                        }
-                                    }
+                                    object_lives_left_bar.UseLife();
                                     object_robot.Launch(object_boat.pixels_x / 25, object_boat.pixels_y / 25);
                                     DOWN_PRESSED = false;
                                 }
                             }
-
-                            if(dstar.STARTED) {
-                                if(dstar_timer > 200) {
-                                    Sense();
-                                    Square move = dstar.Think(actual_cost_array);
-                                    if(move != null) {
-                                        object_robot.SetPosition(move.j, move.i);
-                                    }
-
-                                    dstar_timer = 0;
-                                }
-                            }
-
-
 
                             //Allow our dynamic game objects their think cycle.
                             foreach(Object o in dynamic_objects) {
@@ -407,7 +364,6 @@ namespace WastedSea {
                         }
                 }
             }
-
         }
 
         /** Senses debris for the Dstar. */
@@ -429,7 +385,6 @@ namespace WastedSea {
             }
         }
 
-
         /** Relays input to the game state manager. */
         public override void HandleInput(InputState input) {
             if(input == null)
@@ -441,7 +396,6 @@ namespace WastedSea {
             } else {
             }
         }
-
 
         /** Base draw function. */
         public override void Draw(GameTime gameTime) {
@@ -455,22 +409,19 @@ namespace WastedSea {
             }
 
             DrawString("Power:", 5, 0);
-            DrawString("Score:", 5, 25);
+            DrawString("Score:    " + score.ToString(), 5, 25);
 
 
             // If the game is transitioning on or off, fade it out to black.
-            if(TransitionPosition > 0)
+            if(TransitionPosition > 0) {
                 ScreenManager.FadeBackBufferToBlack(255 - TransitionAlpha);
+            }
 
             if(object_robot.dstar.STARTED) {
-                DrawCostGrid();
-            }
-            if(object_robot.launched) {
                 //DrawCostGrid();
             }
 
             if(game_state == GAMESTATE.SUBSYSTEM) {
-
                 spriteBatch.Begin();
                 spriteBatch.Draw(sub_system, new Rectangle((6 * 25) + 0, (6 * 25) + 0, sub_system.Width, sub_system.Height), Color.White);
                 spriteBatch.Draw(sub_selector, new Rectangle(redX, redY, sub_selector.Width, sub_selector.Height), Color.White);
@@ -501,8 +452,8 @@ namespace WastedSea {
                     int draw_x = dstar.node_array[y, x].j;
                     int draw_y = dstar.node_array[y, x].i;
 
-                    //DrawString(Convert.ToString(dstar.node_array[y, x].Gcost), draw_x * 25, draw_y * 25);
-                    DrawString(Convert.ToString(object_robot.areaKnowledge[y, x]), draw_x * 25, draw_y * 25);
+                    DrawString(Convert.ToString(object_robot.dstar.node_array[y, x].Gcost), draw_x * 25, draw_y * 25);
+                    //DrawString(Convert.ToString(object_robot.areaKnowledge[y, x]), draw_x * 25, draw_y * 25);
                 }
             }
         }

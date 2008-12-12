@@ -171,6 +171,7 @@ namespace WastedSea {
         int dstar_interval;                                 //How often to request a move from D* (interpolate inbetween).
         Square last_dstar_move;                             //Stores the last move received from D*.
         int prev_direc;
+        int score;                                          //Stores scored points for the main update to add to the score each cycle.
 
 
         #endregion
@@ -183,6 +184,7 @@ namespace WastedSea {
             dstar = new DStar();
             dstar_interval = 100;
             dstar_timer = -1;
+            score = 0;
         }
 
         /** Laund the robot. */
@@ -209,6 +211,13 @@ namespace WastedSea {
                 }
             }
 
+        }
+
+        /** Retrieves the current score points. */
+        public int GetScore() {
+            int v = score;
+            score = 0;
+            return v;
         }
 
         /** Return home. */
@@ -508,7 +517,6 @@ namespace WastedSea {
         // Senses the derbis in the way
         private void SenseDerbis() {
             int sensor_distance = 5;
-            //actual_cost_array = new int[24, 32];
 
             for(int j = LegalX(x - sensor_distance); j < LegalX(x + sensor_distance); j++) {
                 for(int i = LegalY(y - sensor_distance); i < LegalY(y + sensor_distance); i++) {
@@ -643,6 +651,37 @@ namespace WastedSea {
 
         public override void Draw() {
             spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
+        }
+    }
+
+    /** Floating debris that require our agent to use D* on the way home. */
+    public class LivesLeftBar : Object {
+        int lives_left;
+
+        public LivesLeftBar(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
+            : base(x, y, texture, spriteBatch) {
+            type = ObjectType.DEBRIS;
+            lives_left = 3;
+        }
+
+        /** No thought. */
+        public override void Think(TimeSpan elapsed_game_time) {}
+
+        /** Draw the 0 to 3 lives in the life bar. */
+        public override void Draw() {
+            for(int i = 0; i < lives_left; i++) {
+                spriteBatch.Draw(texture, new Rectangle(pixels_x + (i * texture.Width / 2 + 2) - 5, pixels_y + 5, texture.Width / 2, texture.Height / 2), Color.White);
+            }
+        }
+
+        public void UseLife() {
+            if(lives_left > 0) {
+                lives_left -= 1;
+            }
+        }
+
+        public void Reset() {
+            lives_left = 3;  
         }
     }
 
