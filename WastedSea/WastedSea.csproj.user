@@ -1,5 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <EnableSecurityDebugging>false</EnableSecurityDebugging>
     <PublishUrlHistory>
     </PublishUrlHistory>
     <InstallUrlHistory>
@@ -13,6 +14,5 @@
     <ApplicationRevision>1</ApplicationRevision>
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
-    <EnableSecurityDebugging>false</EnableSecurityDebugging>
   </PropertyGroup>
 </Project>
