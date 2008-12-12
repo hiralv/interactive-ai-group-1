@@ -129,7 +129,6 @@
   </ItemGroup>
   <ItemGroup>
     <BaseApplicationManifest Include="Properties\app.manifest" />
-    <None Include="WastedSea_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
