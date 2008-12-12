@@ -151,7 +151,7 @@ namespace WastedSea {
             dynamic_objects.Add(object_robot.power);
 
             //Create the lives left bar.
-            object_lives_left_bar = new LivesLeftBar(11, 0, robot, spriteBatch);
+            object_lives_left_bar = new LivesLeftBar(10, 0, robot, spriteBatch);
             dynamic_objects.Add(object_lives_left_bar);
 
             //Default values for the subsumption system.
@@ -231,9 +231,12 @@ namespace WastedSea {
                                 DOWN_PRESSED = true;
                             } else {
                                 if(DOWN_PRESSED) {
-                                    object_robot.retenergy = (float)(energyValue);
-                                    object_lives_left_bar.UseLife();
-                                    object_robot.Launch(object_boat.pixels_x / 25, object_boat.pixels_y / 25);
+                                    if(!object_robot.launched) {
+                                        object_robot.retenergy = (float)(energyValue);
+                                        object_robot.power.Reset();
+                                        object_lives_left_bar.UseLife();
+                                        object_robot.Launch(object_boat.pixels_x / 25, object_boat.pixels_y / 25);
+                                    }
                                     DOWN_PRESSED = false;
                                 }
                             }
@@ -424,7 +427,7 @@ namespace WastedSea {
             }
 
             if(object_robot.dstar.STARTED) {
-                DrawCostGrid();
+                //DrawCostGrid();
             }
 
             if(game_state == GAMESTATE.SUBSYSTEM) {

@@ -89,7 +89,6 @@ namespace WastedSea {
 
         /** Draw this object. */
         public virtual void Draw() {
-            //spriteBatch.Draw(texture, new Rectangle(x * grid_to_pixels, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
             spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
         }
 
@@ -173,6 +172,7 @@ namespace WastedSea {
         int prev_direc;
         int score;                                          //Stores scored points for the main update to add to the score each cycle.
         float power_to_move;
+        bool FAILED;
 
         #endregion
 
@@ -185,8 +185,9 @@ namespace WastedSea {
             dstar_interval = 100;
             dstar_timer = -1;
             score = 0;
-            //power_to_move = 0.25f;
-            power_to_move = 0.50f;
+            power_to_move = 0.25f;
+            //power_to_move = 0.50f;
+            FAILED = false;
         }
 
         /** Laund the robot. */
@@ -279,44 +280,56 @@ namespace WastedSea {
                     Move(elapsed_game_time, direction);
                     prev_direc = direction;
                 }
-            }
-
-            if(dstar.STARTED) {
+            }else if(dstar.STARTED) {
                 dstar_timer += (int)elapsed_game_time.Milliseconds;
+                dstar_interval = 50;
+
+                if(dstar_timer == 0) {
+                    //Square move = dstar.Think(actual_cost_array);
+                }
 
                 //If enough time has passed, get next move from D*.
                 if(dstar_timer > dstar_interval || dstar_timer == -1) {
-                    power.Reset();
-                    SenseDerbis();
-                    Square move = dstar.Think(actual_cost_array);
-                    if(move != null) {
-                        SetPosition(move.j, move.i);
-                        //last_dstar_move = move;
+                    //power.Reset();
+                    if(power.energy > power_to_move) {
+                        power.Consume(power_to_move);
+
+                        SenseDerbis();
+                        Square move = dstar.Think(actual_cost_array);
+                        if(move != null) {
+                            //SetPosition(move.j, move.i);
+                            last_dstar_move = move;
+                        }
+
+                        dstar_timer = 0;
+                    } else {
+                        last_dstar_move = null;
+                        FAILED = true;
                     }
-                    dstar_timer = 0;
                 }
                 //Else interpolate the D* move to the pixel level from the grid level.
                 else {
                     if(last_dstar_move != null) {
-                        int x1 = (pixels_x);
-                        int y1 = (pixels_y);
-                        int x2 = last_dstar_move.j * grid_to_pixels;
-                        int y2 = last_dstar_move.i * grid_to_pixels;
+                        int x1 = pixels_x;
+                        int y1 = pixels_y;
+                        int x2 = Pixels(last_dstar_move.j);
+                        int y2 = Pixels(last_dstar_move.i);
 
                         int dx = x2 - x1;
                         int dy = y2 - y1;
 
-                        float interval = dstar_timer / dstar_interval;
+                        if(dx != 0) {
+                            int df = 34;
+                        }
 
-                        pixels_x = (int)(x1 + (interval * dx));
-                        pixels_y = (int)(y1 + (interval * dy));
+                        float interval = (float)dstar_timer / (float)dstar_interval;
 
-                        x = pixels_x / grid_to_pixels;
-                        y = pixels_y / grid_to_pixels;
+                        pixels_x = (int)((float)x1 + (interval * (float)dx));
+                        pixels_y = (int)((float)y1 + (interval * (float)dy));
                     }
-
-                    //SetPosition(move.j, move.i);
                 }
+            }else{
+                SetPosition(33, 0);
             }
         }
 
@@ -793,14 +806,23 @@ namespace WastedSea {
                 current = power1;
             }
 
-            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, 190, 25), Color.White);
-            spriteBatch.Draw(current, new Rectangle(pixels_x + 5, pixels_y + 4, (int)((energy/max_energy) * (190 - 14)), 15), Color.White);
+            int to_draw = (int)(energy / 2);
+            int x_base = pixels_x + 5;
+            int y_base = pixels_y + 4;
+            int width = 2;
+
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, 162, 25), Color.White);
+
+            for(int i = 0; i < to_draw; i++) {
+                //int height = Math.Max(3, (int)(((float)i / 50.0f) * 15.0f));
+                int height = 15;
+                spriteBatch.Draw(current, new Rectangle(x_base + (i * (width + 1)), y_base + (15 - height), width, height), Color.White);
+            }
         }
 
-        /** Called when an action takes place which requires energy. */ 
+        /** Called when an action takes place which requires energy. */
         public void Consume(float ammount) {
             if(ammount > 0.0f && ammount <= max_energy) {
-                //energy -= (percent * max_energy);
                 energy -= ammount;
             }
         }
