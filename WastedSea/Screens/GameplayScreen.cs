@@ -46,7 +46,7 @@ namespace WastedSea {
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
         List<Object> button_objects;
-        public Texture2D boat, debris, oil, robot, bird, sub_system, sub_selector, powermeter, power;
+        public Texture2D boat, debris, oil, robot, bird, sub_system, sub_selector, powermeter, power1, power2, power3;
         Point sub_selector_loc;
         int[,] actual_cost_array;           //Stores the sensed data to send to the D*.
         int redX = (11 * 25) + 9;
@@ -110,7 +110,7 @@ namespace WastedSea {
             Random ran_number = new Random();
 
             //Create all of the debris.
-            int MAX_DEBRIS = 25;
+            int MAX_DEBRIS = 18;
             Debris new_debris;
             for(int i = 0; i < MAX_DEBRIS; i++) {
                 int ran_x = ran_number.Next(0, 31);
@@ -121,13 +121,14 @@ namespace WastedSea {
             }
 
             bird = content.Load<Texture2D>(@"vBird");
-            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(1, 2), bird, spriteBatch));
-            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(1, 2), bird, spriteBatch));
+            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(1, 3), bird, spriteBatch));
+            dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(1, 3), bird, spriteBatch));
             dynamic_objects.Add(new Bird(ran_number.Next(0, 31), ran_number.Next(1, 2), bird, spriteBatch));
 
             //Create all of the oil.
             int MAX_OIL = 30;
             Object new_oil;
+            ran_number = new Random(1);
             for(int i = 0; i < MAX_OIL; i++) {
                 int ran_x = ran_number.Next(0, 31);
                 int ran_y = ran_number.Next(8, 22);
@@ -143,8 +144,10 @@ namespace WastedSea {
 
             //Add powermeter
             powermeter = content.Load<Texture2D>(@"powermeter");
-            power = content.Load<Texture2D>(@"power");
-            object_robot.power = new Powermeter(3, 0, powermeter, spriteBatch, power);
+            power1 = content.Load<Texture2D>(@"power1");
+            power2 = content.Load<Texture2D>(@"power2");
+            power3 = content.Load<Texture2D>(@"power3");
+            object_robot.power = new Powermeter(3, 0, powermeter, spriteBatch, power1,power2, power3);
             dynamic_objects.Add(object_robot.power);
 
             //Create the lives left bar.
@@ -199,11 +202,15 @@ namespace WastedSea {
                 switch(game_state) {
                     case GAMESTATE.OTHER: {
                             if(ks.IsKeyDown(Keys.Right)) {         //Right arrow.
-                                object_boat.MoveRight(gameTime.ElapsedGameTime);
+                                if(!object_robot.launched) {
+                                    object_boat.MoveRight(gameTime.ElapsedGameTime);
+                                }
                             }
 
                             if(ks.IsKeyDown(Keys.Left)){            //Left arrow.
-                                object_boat.MoveLeft(gameTime.ElapsedGameTime);
+                                if(!object_robot.launched) {
+                                    object_boat.MoveLeft(gameTime.ElapsedGameTime);
+                                }
                             }
 
                             if(ks.IsKeyDown(Keys.Space)){            //Space bar.
@@ -224,6 +231,7 @@ namespace WastedSea {
                                 DOWN_PRESSED = true;
                             } else {
                                 if(DOWN_PRESSED) {
+                                    object_robot.retenergy = (float)(energyValue);
                                     object_lives_left_bar.UseLife();
                                     object_robot.Launch(object_boat.pixels_x / 25, object_boat.pixels_y / 25);
                                     DOWN_PRESSED = false;
@@ -296,7 +304,6 @@ namespace WastedSea {
                                     {
                                         if(energyValue > 0) {
                                             energyValue--;
-                                            object_robot.retenergy = (float)(energyValue * 0.01);
                                         }
                                     } else if(which == 3) //Min Depth
                                     {
@@ -325,9 +332,8 @@ namespace WastedSea {
                                 if(RIGHT_PRESSED) {
                                     if(which == 2) //Energy Value
                                     {
-                                        if(energyValue < 10) {
-                                            energyValue++;
-                                            object_robot.retenergy = (float)(energyValue * 0.01);
+                                        if(energyValue < 100) {
+                                            object_robot.retenergy = (float)(energyValue);
                                         }
                                     } else if(which == 3) //Min Value
                                     {
@@ -418,7 +424,7 @@ namespace WastedSea {
             }
 
             if(object_robot.dstar.STARTED) {
-                //DrawCostGrid();
+                DrawCostGrid();
             }
 
             if(game_state == GAMESTATE.SUBSYSTEM) {
@@ -449,8 +455,8 @@ namespace WastedSea {
         public void DrawCostGrid() {
             for(int y = 0; y < 24; y++) {
                 for(int x = 0; x < 32; x++) {
-                    int draw_x = dstar.node_array[y, x].j;
-                    int draw_y = dstar.node_array[y, x].i;
+                    int draw_x = object_robot.dstar.node_array[y, x].j;
+                    int draw_y = object_robot.dstar.node_array[y, x].i;
 
                     DrawString(Convert.ToString(object_robot.dstar.node_array[y, x].Gcost), draw_x * 25, draw_y * 25);
                     //DrawString(Convert.ToString(object_robot.areaKnowledge[y, x]), draw_x * 25, draw_y * 25);

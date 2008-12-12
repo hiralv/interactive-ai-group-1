@@ -172,7 +172,7 @@ namespace WastedSea {
         Square last_dstar_move;                             //Stores the last move received from D*.
         int prev_direc;
         int score;                                          //Stores scored points for the main update to add to the score each cycle.
-
+        float power_to_move;
 
         #endregion
 
@@ -185,6 +185,8 @@ namespace WastedSea {
             dstar_interval = 100;
             dstar_timer = -1;
             score = 0;
+            //power_to_move = 0.25f;
+            power_to_move = 0.50f;
         }
 
         /** Laund the robot. */
@@ -231,11 +233,9 @@ namespace WastedSea {
 
             if(launched) {
                 if(retenergy > power.energy) {
-                    
                     actual_cost_array = new int[24, 32];
                     dstar = new DStar();
                     dstar.Start(pixels_x / 25, pixels_y / 25, (int)Math.Floor((double)boatx / 25), (int)Math.Floor((double)boaty / 25));
-
                     Retun();
                 }
                 //This would be changed to the oil value presumably
@@ -420,8 +420,6 @@ namespace WastedSea {
 
         /** Moves int the given direction. */
         private void Move(TimeSpan elapsed_game_time, int direction) {
-            float power_to_move = 0.5f;
-
             switch(direction) {
                 case 0:
                     MoveLeft(elapsed_game_time);
@@ -486,13 +484,6 @@ namespace WastedSea {
                     areaKnowledge[y, x] -= 15;
                     step[y, x] += 2;
                     break;
-            }
-
-            //Use more power to go diaganol.
-            if(direction > 3) {
-                power.Consume(2 * power_to_move);
-            }else {
-                power.Consume(power_to_move);
             }
         }
 
@@ -587,6 +578,71 @@ namespace WastedSea {
             }
 
             return ret;
+        }
+
+        public void MoveUp(TimeSpan elapsed_game_time) {
+            if(power.energy >= power_to_move){
+                power.Consume(power_to_move);
+
+                time += (elapsed_game_time.Milliseconds + speed);
+
+                pixels_y -= time / grid_to_pixels;
+                time = time % grid_to_pixels;
+
+                if(pixels_y > y_max * grid_to_pixels) {
+                    pixels_y = y_max * grid_to_pixels;
+                }
+
+                y = (int)Math.Floor((double)(pixels_y / 25));
+            }
+        }
+
+        public void MoveDown(TimeSpan elapsed_game_time) {
+            if(power.energy >= power_to_move) {
+                power.Consume(power_to_move);
+                time += (elapsed_game_time.Milliseconds + speed);
+
+                pixels_y += time / grid_to_pixels;
+                time = time % grid_to_pixels;
+
+                if(pixels_y > y_max * grid_to_pixels) {
+                    pixels_y = y_max * grid_to_pixels;
+                }
+
+                y = (int)Math.Floor((double)(pixels_y / 25));
+            }
+        }
+
+        public void MoveLeft(TimeSpan elapsed_game_time) {
+            if(power.energy >= power_to_move) {
+                power.Consume(power_to_move);
+                time += (elapsed_game_time.Milliseconds + speed);
+
+                pixels_x -= time / grid_to_pixels;
+                time = time % grid_to_pixels;
+
+                if(pixels_x < 0) {
+                    pixels_x = 0;
+                }
+
+                x = (int)Math.Floor((double)(pixels_x / 25));
+            }
+        }
+
+        public void MoveRight(TimeSpan elapsed_game_time) {
+            if(power.energy >= power_to_move) {
+                power.Consume(power_to_move);
+                time += (elapsed_game_time.Milliseconds + speed);
+
+                pixels_x += time / grid_to_pixels;
+                time = time % grid_to_pixels;
+
+                if(pixels_x > x_max * grid_to_pixels) {
+                    pixels_x = x_max * grid_to_pixels;
+                }
+
+                x = (int)Math.Floor((double)(pixels_x / 25));
+            }
         }
     }
 
@@ -706,18 +762,21 @@ namespace WastedSea {
 
     /** Shows the current power of the robot. */
     public class Powermeter : Object {
-        public Texture2D power;                         //Graphic to display for the power bar.
+        public Texture2D current, power1,power2,power3;                         //Graphic to display for the power bar.
         public float energy;                            //The current energy displayed available for consumption.
         public float max_energy;                        //Max possible energy.
 
         /** Overrides default constructor to set default energy setting. */
-        public Powermeter(int x, int y, Texture2D texture, SpriteBatch spriteBatch, Texture2D power)
+        public Powermeter(int x, int y, Texture2D texture, SpriteBatch spriteBatch, Texture2D power1, Texture2D power2, Texture2D power3)
             : base(x, y, texture, spriteBatch) {
             
             type = ObjectType.POWERMETER;
-            this.power = power;
+            this.power1 = power1;
+            this.power2 = power2;
+            this.power3 = power3;
             this.energy = 100.0f;
             this.max_energy = 100.0f;
+            this.current = power1;
         }
 
         public override void Think(TimeSpan elapsed_game_time) {
@@ -726,8 +785,16 @@ namespace WastedSea {
 
         /** Draws the power sprites on the interface. */
         public override void Draw() {
+            if(energy < 33) {
+                current = power3;
+            }else if(energy < 66) {
+                current = power2;
+            } else {
+                current = power1;
+            }
+
             spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, 190, 25), Color.White);
-            spriteBatch.Draw(power, new Rectangle(pixels_x + 5, pixels_y + 4, (int)((energy/max_energy) * (190 - 14)), 15), Color.White);
+            spriteBatch.Draw(current, new Rectangle(pixels_x + 5, pixels_y + 4, (int)((energy/max_energy) * (190 - 14)), 15), Color.White);
         }
 
         /** Called when an action takes place which requires energy. */ 
