@@ -31,7 +31,7 @@ namespace WastedSea
         public Tag tag = Tag.NEW;
     }
 
-    class DStar
+    public class DStar
     {
         Square goal;
         Square start;

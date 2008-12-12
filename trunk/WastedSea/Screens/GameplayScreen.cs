@@ -69,7 +69,7 @@ namespace WastedSea {
 
         #region Initialization
 
-        /// Constructor.
+        /** Constructor. */
         public GameplayScreen() {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
@@ -83,11 +83,12 @@ namespace WastedSea {
             actual_cost_array = new int[24, 32];
         }
 
-        /// Load graphics content for the game.
+        // Load graphics content for the game.
         public override void LoadContent() {
 
-            if(content == null)
+            if(content == null) {
                 content = new ContentManager(ScreenManager.Game.Services, "Content");
+            }
 
             Font1 = content.Load<SpriteFont>("SpriteFont1");
             FontPos = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2);
@@ -146,7 +147,7 @@ namespace WastedSea {
 
 
             //Default values for the subsumption system.
-            energyValue     = 10;
+            energyValue     = 20;
             minValue        = 3;
             maxValue        = 20;
             oilRangeValue   = 10;
@@ -461,8 +462,8 @@ namespace WastedSea {
             if(TransitionPosition > 0)
                 ScreenManager.FadeBackBufferToBlack(255 - TransitionAlpha);
 
-            if(dstar.STARTED) {
-                //DrawCostGrid();
+            if(object_robot.dstar.STARTED) {
+                DrawCostGrid();
             }
             if(object_robot.launched) {
                 //DrawCostGrid();

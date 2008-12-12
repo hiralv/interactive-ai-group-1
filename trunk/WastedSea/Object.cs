@@ -71,19 +71,21 @@ namespace WastedSea {
             pixels_y = y * 25;
         }
 
+        /** Bounds check on an index. */
         public int LegalX(int num) {
             num = Math.Max(num, 0);
             num = Math.Min(num, x_max);
             return num;
         }
 
+        /** Bounds check on an index. */
         public int LegalY(int num) {
             num = Math.Max(num, 0);
             num = Math.Min(num, y_max);
             return num;
         }
 
-
+        /** Draw this object. */
         public virtual void Draw() {
             spriteBatch.Draw(texture, new Rectangle(x * grid_to_pixels, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
         }
@@ -98,7 +100,6 @@ namespace WastedSea {
                 pixels_y = y_max * grid_to_pixels;
             }
 
-            //pixels_y = y * grid_to_pixels;
             y = (int)Math.Floor((double)(pixels_y / 25));
         }
 
@@ -112,7 +113,6 @@ namespace WastedSea {
                 pixels_y = y_max * grid_to_pixels;
             }
 
-            //pixels_y = y * grid_to_pixels;
             y = (int)Math.Floor((double)(pixels_y / 25));
         }
 
@@ -126,7 +126,6 @@ namespace WastedSea {
                 pixels_x = 0;
             }
 
-            //pixels_x = x * grid_to_pixels;
             x = (int)Math.Floor((double)(pixels_x / 25));
         }
 
@@ -140,7 +139,6 @@ namespace WastedSea {
                 pixels_x = x_max * grid_to_pixels;
             }
 
-            //pixels_x = x * grid_to_pixels;
             x = (int)Math.Floor((double)(pixels_x / 25));
         }
 
@@ -152,7 +150,6 @@ namespace WastedSea {
     public class Robot : Object {
         #region Variables
         public bool launched;
-        bool moving_left;
         public int timeSinceLaunched;
         public Powermeter power;
         public int minDepth;
@@ -162,7 +159,7 @@ namespace WastedSea {
         public static List<Oil> sensedOil = new List<Oil>();
         public static List<Oil> removeOil = new List<Oil>();
         public float retenergy;
-        DStar dstar;
+        public DStar dstar;
         int[,] actual_cost_array;
         public int[,] areaKnowledge;
         public int[,] step;
@@ -179,7 +176,6 @@ namespace WastedSea {
             : base(x, y, texture, spriteBatch) {
             type = ObjectType.ROBOT;
             launched = false;
-            moving_left = true;
             speed = 100;
             dstar = new DStar();
             dstar_interval = 100;
@@ -210,12 +206,12 @@ namespace WastedSea {
 
         }
 
-        // Return home
+        /** Return home. */
         public void Retun() {
             launched = false;
         }
 
-        // Subsumption Architecture
+        /** Subsumption architecture. */
         public override void Think(TimeSpan elapsed_game_time) {
             depth = y - 4;
 
@@ -256,8 +252,7 @@ namespace WastedSea {
                             Move(elapsed_game_time, 3);
                         else if(oil.y < y)
                             Move(elapsed_game_time, 2);
-                    }
-                    
+                    } 
                 }else{
                     SenseOil();
                     int direction = GetRandomDirecion();
@@ -277,11 +272,12 @@ namespace WastedSea {
 
                 //If enough time has passed, get next move from D*.
                 if(dstar_timer > dstar_interval || dstar_timer == -1) {
+                    power.Reset();
                     SenseDerbis();
                     Square move = dstar.Think(actual_cost_array);
                     if(move != null) {
-                        //SetPosition(move.j, move.i);
-                        last_dstar_move = move;
+                        SetPosition(move.j, move.i);
+                        //last_dstar_move = move;
                     }
                     dstar_timer = 0;
                 }
@@ -488,7 +484,7 @@ namespace WastedSea {
 
         // Tells if any oil is in the range
         private void SenseOil() {
-            cost_to_sense = 0.05f;
+            float cost_to_sense = 0.05f;
 
             int xdiff, ydiff;
             foreach(Oil oil in Oil.oil_list) {
@@ -509,7 +505,6 @@ namespace WastedSea {
             int sensor_distance = 5;
             //actual_cost_array = new int[24, 32];
 
-
             for(int j = LegalX(x - sensor_distance); j < LegalX(x + sensor_distance); j++) {
                 for(int i = LegalY(y - sensor_distance); i < LegalY(y + sensor_distance); i++) {
                     foreach(Object o in Debris.derbislist) {
@@ -522,6 +517,7 @@ namespace WastedSea {
             }
         }
 
+        /** Draws this object. */
         public override void Draw() {
             spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
         }
@@ -581,7 +577,7 @@ namespace WastedSea {
         }
     }
 
-    //The moveable player-controlled boat.
+    /** The moveable player-controlled boat. */
     public class Boat : Object {
         public Boat(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch) {
@@ -594,7 +590,7 @@ namespace WastedSea {
         }
     }
 
-    //The bird.
+    /** The flying bird object. */
     public class Bird : Object {
         public Bird(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
             : base(x, y, texture, spriteBatch) {
@@ -618,7 +614,7 @@ namespace WastedSea {
         }
     }
 
-    //Floating debris that require our agent to use D* on the way home.
+    /** Floating debris that require our agent to use D* on the way home. */
     public class Debris : Object {
         public static List<Debris> derbislist = new List<Debris>();
 
@@ -645,7 +641,7 @@ namespace WastedSea {
         }
     }
 
-    //Oil the floating oil.
+    /** Oil the floating oil. */
     public class Oil : Object {
         static public List<Oil> oil_list = new List<Oil>();
 
@@ -656,17 +652,6 @@ namespace WastedSea {
 
         //Causes the debri to float right to left and reset on the right side of the screen.
         public override void Think(TimeSpan elapsed_game_time) {
-
-        }
-
-        public override void Draw() {
-            spriteBatch.Draw(texture, new Rectangle(pixels_x, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
-        }
-    }
-
-    public class Button : Object {
-        public Button(int x, int y, Texture2D texture, SpriteBatch spriteBatch)
-            : base(x, y, texture, spriteBatch) {
 
         }
 
