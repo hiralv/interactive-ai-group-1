@@ -28,31 +28,23 @@ namespace WastedSea {
 
     /** The base class for all game objects that go doubleo the object lists. */
     public class Object {
-        #region Variables
         public ObjectType type;
         public int x_max = 31;
         public int y_max = 22;
         public int grid_to_pixels = 25;
-
         public int x;
         public int y;
-
         public int offset_x;    //Converts the grid coordinates to pixel coordinates for smoother animations.
         public int offset_y;
-
         public Random ran;
         public int pixels_x;
         public int pixels_y;
-
         public Texture2D texture;
         public int time;
         public int speed;
         public SpriteBatch spriteBatch;
-
         public Direction current_dir;
-        #endregion
 
-        #region Methods
         public Object(int x, int y, Texture2D texture, SpriteBatch spriteBatch) {
             this.texture = texture;
             this.x = x;
@@ -67,8 +59,8 @@ namespace WastedSea {
         public void SetPosition(int x, int y) {
             this.x = x;
             this.y = y;
-            pixels_x = x * 25;
-            pixels_y = y * 25;
+            pixels_x = Pixels(x);
+            pixels_y = Pixels(y);
         }
 
         /** Bounds check on an index. */
@@ -85,9 +77,20 @@ namespace WastedSea {
             return num;
         }
 
+        /** Converts grid coordinate to pixel coordinate. */
+        public int Pixels(int grid) {
+            return grid * 25;
+        }
+
+        /** Converts pixel coordinate to grid coordinate. */
+        public int Grid(int pixels) {
+            return pixels / 25;
+        }
+
         /** Draw this object. */
         public virtual void Draw() {
-            spriteBatch.Draw(texture, new Rectangle(x * grid_to_pixels, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
+            //spriteBatch.Draw(texture, new Rectangle(x * grid_to_pixels, y * grid_to_pixels, texture.Width, texture.Height), Color.White);
+            spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
         }
 
         public void MoveUp(TimeSpan elapsed_game_time) {
@@ -104,6 +107,7 @@ namespace WastedSea {
         }
 
         public void MoveDown(TimeSpan elapsed_game_time) {
+
             time += (elapsed_game_time.Milliseconds + speed);
 
             pixels_y += time / grid_to_pixels;
@@ -143,10 +147,9 @@ namespace WastedSea {
         }
 
         public virtual void Think(TimeSpan elapsed_game_time) { }
-        #endregion
     }
 
-    //The moveable automated robot.
+    /** The moveable automated robot. */
     public class Robot : Object {
         #region Variables
         public bool launched;
@@ -182,7 +185,7 @@ namespace WastedSea {
             dstar_timer = -1;
         }
 
-        // Laund the robot
+        /** Laund the robot. */
         public void Launch(int x, int y) {
             this.x = x;
             this.y = y + 1;
@@ -195,13 +198,15 @@ namespace WastedSea {
             step = new int[24, 32];
 
             for(int i = 0; i < 24; i++) {
-                for(int j = 0; j < 32; j++)
+                for(int j = 0; j < 32; j++) {
                     areaKnowledge[i, j] = -99999;
+                }
             }
 
             for(int i = LegalY(minDepth + 5); i < LegalY(maxDepth + 5); i++) {
-                for(int j = 0; j < 32; j++)
+                for(int j = 0; j < 32; j++) {
                     areaKnowledge[i, j] = 1;
+                }
             }
 
         }
