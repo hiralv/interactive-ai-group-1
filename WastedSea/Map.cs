@@ -58,7 +58,7 @@ namespace WastedSea {
             sky = Content.Load<Texture2D>(@"Sky");
             sea_floor = Content.Load<Texture2D>(@"SeaFloor");
             sea_top = Content.Load<Texture2D>(@"SeaTop");
-            //water = Content.Load<Texture2D>(@"water");
+            water = Content.Load<Texture2D>(@"water");
 
             base.Initialize();
         }
@@ -75,7 +75,7 @@ namespace WastedSea {
 
         public void Draw(SpriteBatch spriteBatch) {
             spriteBatch.Begin();
-           // spriteBatch.Draw(water, new Rectangle(0, 98, water.Width, water.Height), Color.White);
+            spriteBatch.Draw(water, new Rectangle(0, 90, water.Width, water.Height), Color.White);
 
             for(int y = 0; y < 24; y++) {
                 for(int x = 0; x < 32; x++) {
@@ -87,8 +87,8 @@ namespace WastedSea {
                                 break;
                             }
                         case 1: {
-                                tile = sea;
-                                //tile = null;
+                                //tile = sea;
+                                tile = null;
                                 break;
                             }
                         case 4: {
@@ -100,8 +100,8 @@ namespace WastedSea {
                                 break;
                             }
                         case 6: {
-                                tile = sea_top;
-                                //tile = null;
+                                //tile = sea_top;
+                                tile = null;
                                 break;
                             }
                         default: {
