@@ -186,7 +186,6 @@ namespace WastedSea {
             dstar_timer = -1;
             score = 0;
             power_to_move = 0.25f;
-            //power_to_move = 0.50f;
             FAILED = false;
         }
 

@@ -48,7 +48,6 @@ namespace WastedSea {
         //Powermeter object_powermeter;
         Game1 cur = new Game1();
         List<Object> dynamic_objects;
-        List<Object> button_objects;
         public Texture2D boat, debris, oil, robot, bird, sub_system, sub_selector, powermeter, power1, power2, power3;
         Point sub_selector_loc;
         int selectorGlow = 1;
@@ -92,7 +91,6 @@ namespace WastedSea {
 
             main_map = new Map(cur);
             dynamic_objects = new List<Object>();
-            button_objects = new List<Object>();
             dstar_timer = 0;
             sub_params = new int[4];
             game_state = GAMESTATE.OTHER;
@@ -224,22 +222,23 @@ namespace WastedSea {
 
             if(IsActive) {
                 KeyboardState ks = Keyboard.GetState();
+                GamePadState gameControllerState = GamePad.GetState(PlayerIndex.One);
 
                 switch(game_state) {
                     case GAMESTATE.OTHER: {
-                            if(ks.IsKeyDown(Keys.Right)) {         //Right arrow.
+                            if(ks.IsKeyDown(Keys.Right) || gameControllerState.DPad.Right == ButtonState.Pressed) {         //Right arrow.
                                 if(!object_robot.launched) {
                                     object_boat.MoveRight(gameTime.ElapsedGameTime);
                                 }
                             }
 
-                            if(ks.IsKeyDown(Keys.Left)){            //Left arrow.
+                            if(ks.IsKeyDown(Keys.Left) || gameControllerState.DPad.Left == ButtonState.Pressed) {            //Left arrow.
                                 if(!object_robot.launched) {
                                     object_boat.MoveLeft(gameTime.ElapsedGameTime);
                                 }
                             }
 
-                            if(ks.IsKeyDown(Keys.Space)){            //Space bar.
+                            if(ks.IsKeyDown(Keys.Space) || gameControllerState.Buttons.B == ButtonState.Pressed) {            //Space bar.
                                 SPACE_PRESSED = true;
                             } else {
                                 if(SPACE_PRESSED) {
@@ -254,7 +253,7 @@ namespace WastedSea {
                             }
 
                             //Launches the robot.
-                            if(ks.IsKeyDown(Keys.Down)) {
+                            if(ks.IsKeyDown(Keys.Down) || gameControllerState.Buttons.A == ButtonState.Pressed) {
                                 DOWN_PRESSED = true;
                             } else {
                                 if(DOWN_PRESSED) {
@@ -288,7 +287,7 @@ namespace WastedSea {
                         }
 
                     case GAMESTATE.SUBSYSTEM: {
-                            if(ks.IsKeyDown(Keys.Down)) {
+                            if(ks.IsKeyDown(Keys.Down) || gameControllerState.DPad.Down == ButtonState.Pressed) {
                                 UP_PRESSED = false;
                                 DOWN_PRESSED = true;
                             } else {
@@ -309,7 +308,7 @@ namespace WastedSea {
                                 }
                             }
 
-                            if(ks.IsKeyDown(Keys.Up)) {
+                            if(ks.IsKeyDown(Keys.Up) || gameControllerState.DPad.Up == ButtonState.Pressed) {
                                 DOWN_PRESSED = false;
                                 UP_PRESSED = true;
                             } else {
@@ -331,7 +330,7 @@ namespace WastedSea {
                             }
 
                             //Adjust values
-                            if(ks.IsKeyDown(Keys.Left)) {
+                            if(ks.IsKeyDown(Keys.Left) || gameControllerState.DPad.Left == ButtonState.Pressed) {
                                 LEFT_PRESSED = true;
                             } else {
                                 if(LEFT_PRESSED) {
@@ -364,7 +363,7 @@ namespace WastedSea {
                                 }
                             }
 
-                            if(ks.IsKeyDown(Keys.Right)) {
+                            if(ks.IsKeyDown(Keys.Right) || gameControllerState.DPad.Right == ButtonState.Pressed) {
                                 RIGHT_PRESSED = true;
                             } else {
                                 if(RIGHT_PRESSED) {
@@ -401,7 +400,7 @@ namespace WastedSea {
                             }
 
 
-                            if(ks.IsKeyDown(Keys.Space)) {
+                            if(ks.IsKeyDown(Keys.Space) || gameControllerState.Buttons.B == ButtonState.Pressed) {
                                 SPACE_PRESSED = true;
                             } else {
                                 if(SPACE_PRESSED) {
@@ -492,6 +491,10 @@ namespace WastedSea {
                 DrawString(minValue.ToString(), 289, 240);
                 DrawString(maxValue.ToString(), 289, 280);
                 DrawString(oilRangeValue.ToString(), 289, 318);
+            }
+
+            if(object_robot.FAILED) {
+                DrawString("You Failed!", 275, 75);
             }
         }
 

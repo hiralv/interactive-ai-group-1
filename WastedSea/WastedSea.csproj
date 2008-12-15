@@ -15,8 +15,8 @@
     <Thumbnail>GameThumbnail.png</Thumbnail>
     <ManifestCertificateThumbprint>0EC70793AB88887983CD4A3D8A86F3EC6ECB60C6</ManifestCertificateThumbprint>
     <ManifestKeyFile>WastedSea_TemporaryKey.pfx</ManifestKeyFile>
-    <GenerateManifests>false</GenerateManifests>
-    <SignManifests>false</SignManifests>
+    <GenerateManifests>true</GenerateManifests>
+    <SignManifests>true</SignManifests>
     <PublishUrl>publish\wastedseatry1\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -54,6 +54,7 @@
     <NoStdLib>true</NoStdLib>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <PlatformTarget>x86</PlatformTarget>
+    <DocumentationFile>bin\x86\Release\WastedSea.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=6d5c3888ef60e27d, processorArchitecture=x86">
