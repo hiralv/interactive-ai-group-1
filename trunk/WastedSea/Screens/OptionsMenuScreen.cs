@@ -23,7 +23,7 @@ namespace WastedSea
     {
         #region Fields
 
-        MenuEntry ungulateMenuEntry;
+        MenuEntry menu_sound_on;
         MenuEntry languageMenuEntry;
         MenuEntry frobnicateMenuEntry;
         MenuEntry elfMenuEntry;
@@ -56,7 +56,7 @@ namespace WastedSea
             : base("Options")
         {
             // Create our menu entries.
-            ungulateMenuEntry = new MenuEntry(string.Empty);
+            menu_sound_on = new MenuEntry(string.Empty);
             languageMenuEntry = new MenuEntry(string.Empty);
             frobnicateMenuEntry = new MenuEntry(string.Empty);
             elfMenuEntry = new MenuEntry(string.Empty);
@@ -66,14 +66,14 @@ namespace WastedSea
             MenuEntry backMenuEntry = new MenuEntry("Back");
 
             // Hook up menu event handlers.
-            ungulateMenuEntry.Selected += UngulateMenuEntrySelected;
+            menu_sound_on.Selected += menu_sound_onSelected;
             languageMenuEntry.Selected += LanguageMenuEntrySelected;
             frobnicateMenuEntry.Selected += FrobnicateMenuEntrySelected;
             elfMenuEntry.Selected += ElfMenuEntrySelected;
             backMenuEntry.Selected += OnCancel;
             
             // Add entries to the menu.
-            MenuEntries.Add(ungulateMenuEntry);
+            MenuEntries.Add(menu_sound_on);
             MenuEntries.Add(languageMenuEntry);
             MenuEntries.Add(frobnicateMenuEntry);
             MenuEntries.Add(elfMenuEntry);
@@ -86,7 +86,7 @@ namespace WastedSea
         /// </summary>
         void SetMenuEntryText()
         {
-            ungulateMenuEntry.Text = "Preferred ungulate: " + currentUngulate;
+            menu_sound_on.Text = "Sound On";
             languageMenuEntry.Text = "Language: " + languages[currentLanguage];
             frobnicateMenuEntry.Text = "Frobnicate: " + (frobnicate ? "on" : "off");
             elfMenuEntry.Text = "elf: " + elf;
@@ -101,7 +101,7 @@ namespace WastedSea
         /// <summary>
         /// Event handler for when the Ungulate menu entry is selected.
         /// </summary>
-        void UngulateMenuEntrySelected(object sender, EventArgs e)
+        void menu_sound_onSelected(object sender, EventArgs e)
         {
             currentUngulate++;
 
