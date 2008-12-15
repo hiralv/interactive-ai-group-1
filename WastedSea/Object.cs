@@ -228,7 +228,7 @@ namespace WastedSea {
             launched = false;
         }
 
-        /** Subsumption architecture. */
+        /** Subsumption architecture.-VORA */
         public override void Think(TimeSpan elapsed_game_time) {
             depth = y - 4;
 
@@ -337,7 +337,7 @@ namespace WastedSea {
             }
         }
 
-        // Get a random direction to move
+        // Get a random direction to move - VORA */
         private int GetRandomDirecion() {
             int direction = ran.Next(0, 8);
             int[] moves = new int[8] { -99999, -99999, -99999, -99999, -99999, -99999, -99999, -99999 };
@@ -435,7 +435,7 @@ namespace WastedSea {
             return direction;
         }
 
-        /** Moves int the given direction. */
+        /** Moves int the given direction. - VORA*/
         private void Move(TimeSpan elapsed_game_time, int direction) {
             switch(direction) {
                 case 0:
@@ -504,7 +504,7 @@ namespace WastedSea {
             }
         }
 
-        // Tells if any oil is in the range
+        // Tells if any oil is in the range - VORA */
         private void SenseOil() {
             float cost_to_sense = 0.05f;
 
@@ -543,7 +543,7 @@ namespace WastedSea {
             spriteBatch.Draw(texture, new Rectangle(pixels_x, pixels_y, texture.Width, texture.Height), Color.White);
         }
 
-        // Get the direction to move
+        // Get the direction to move - VORA */
         private int GetDirection(int x, int y, int range) {
             int currx = x;
             int curry = y;
@@ -777,7 +777,7 @@ namespace WastedSea {
         }
     }
 
-    /** Shows the current power of the robot. */
+    /** Shows the current power of the robot. - VORA */ 
     public class Powermeter : Object {
         public Texture2D current, power1,power2,power3;                         //Graphic to display for the power bar.
         public float energy;                            //The current energy displayed available for consumption.
