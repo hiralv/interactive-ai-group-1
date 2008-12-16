@@ -55,10 +55,10 @@ namespace WastedSea {
         int redX = (11 * 25) + 9;
         int redY = (8 * 25) - 7;
         int which = 1;
-        int energyValue = 0;
-        int minValue = 2;
-        int maxValue = 2;
-        int oilRangeValue = 1;
+        int energyValue;
+        int minValue;
+        int maxValue;
+        int oilRangeValue;
         int score;        
 
         Random random = new Random();
@@ -168,9 +168,9 @@ namespace WastedSea {
 
             //Default values for the subsumption system.
             energyValue = 20;
-            minValue = 3;
-            maxValue = 20;
-            oilRangeValue = 10;
+            minValue = 2;
+            maxValue = 17;
+            oilRangeValue = 2;
 
             score = 0;
 
@@ -380,18 +380,17 @@ namespace WastedSea {
 
                                     } else if(which == 2) //Min Value
                                     {
-                                        if(minValue < 17) {
+                                        if(minValue < 16 && minValue < maxValue) {
                                             minValue++;
-                                            maxValue++;
                                         }
                                     } else if(which == 3) //Max Value
                                     {
-                                        if(maxValue < 19) {
+                                        if(maxValue < 18) {
                                             maxValue++;
                                         }
                                     } else //Oil Range
                                     {
-                                        if(oilRangeValue < 10) {
+                                        if(oilRangeValue < 5) {
                                             oilRangeValue++;
                                         }
                                     }
@@ -473,6 +472,9 @@ namespace WastedSea {
                 //DrawCostGrid();
             }
 
+            //if (object_robot.launched)
+                //DrawCostGrid();
+
             if (game_state == GAMESTATE.SUBSYSTEM)
             {
 
@@ -516,8 +518,8 @@ namespace WastedSea {
                     int draw_x = object_robot.dstar.node_array[y, x].j;
                     int draw_y = object_robot.dstar.node_array[y, x].i;
 
-                    DrawString(Convert.ToString(object_robot.dstar.node_array[y, x].Gcost), draw_x * 25, draw_y * 25);
-                    //DrawString(Convert.ToString(object_robot.areaKnowledge[y, x]), draw_x * 25, draw_y * 25);
+                    //DrawString(Convert.ToString(object_robot.dstar.node_array[y, x].Gcost), draw_x * 25, draw_y * 25);
+                    DrawString(Convert.ToString(object_robot.areaKnowledge[y, x]), draw_x * 25, draw_y * 25);
                 }
             }
         }
